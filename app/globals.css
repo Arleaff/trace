@@ -2,15 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+
+/* animates on category change, may be */
+
 @keyframes ringAnimation {
   0% {
     stroke-dashoffset: 157.07963267948966;
   }
 }
-.progress {
+
+.progress { 
   animation: 1s ease-in-out 0s 1 ringAnimation;
-  transition: all ease-in-out 1s;
 }
+
+
+/* Animates on start, def don't want this bug */
+/* Debateable not necessary */
+@keyframes slideInFromLeft {
+  0% {
+    height: 0px;
+  }
+
+
+}
+
+.card {
+  animation: .5s ease-out 0s 1 slideInFromLeft;
+}
+
 
 :root {
   --background: #ffffff;
@@ -30,3 +49,4 @@ body {
   font-family: 'Geist Mono';
   /* font-family: 'Geist'; */
 }
+

@@ -8,14 +8,13 @@ export default function CategoryColumn({ children, categoryName, hoverColor }: {
         id: categoryName,
     });
     const style: React.CSSProperties = {
-        backgroundColor: hoverColor,
+        backgroundColor: isOver ? hoverColor : "white",
+        transition: "all ease-in-out .5s"
     };
 
-    // or any other unique string
-
     return (
-        <div id={categoryName} ref={setNodeRef} style={isOver ? style : undefined } className="flex flex-col gap-3 flex-1 p-2">
-            <span className=" border rounded-lg w-fit px-5 hover:cursor-pointer bg-white">{categoryName}</span>
+        <div id={categoryName} ref={setNodeRef} style={style } className="flex flex-col flex-1 p-2">
+            <span className=" border rounded-lg w-fit px-5 hover:cursor-pointer bg-white mb-3">{categoryName}</span>
             {children}
         </div>
     );
