@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes ringAnimation {
+  0% {
+    stroke-dashoffset: 157.07963267948966;
+  }
+}
+.progress {
+  animation: 1s ease-in-out 0s 1 ringAnimation;
+  transition: all ease-in-out 1s;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -17,5 +27,6 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Geist Mono';
+  /* font-family: 'Geist'; */
 }
