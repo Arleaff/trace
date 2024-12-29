@@ -5,8 +5,9 @@ import { useDroppable } from '@dnd-kit/core';
 import { useState } from 'react';
 
 
-export default function CategoryColumn({ children, categoryName, hoverColor, onFilter }: 
-    { children?: React.ReactNode, categoryName: string, hoverColor: string,  onFilter: () => CategoryFilter 
+export default function CategoryColumn({ children, categoryName, hoverColor, hover, onFilter }: 
+    {
+        children?: React.ReactNode, categoryName: string, hoverColor: string, onFilter: () => CategoryFilter, hover: boolean
 
 }) {
 
@@ -17,12 +18,12 @@ export default function CategoryColumn({ children, categoryName, hoverColor, onF
     });
 
     const style: React.CSSProperties = {
-        backgroundColor: isOver ? hoverColor : "white",
+        backgroundColor: hover ? hoverColor : "white",
         transition: "all ease-in-out .5s",
     };
 
     return (
-        <div id={categoryName} ref={setNodeRef} style={style} className="flex flex-col p-2 w-screen">
+        <div id={categoryName} ref={setNodeRef} style={style} className="flex flex-col p-2 w-screen rounded-xl">
             <span onClick={ () => {
                 setColumnView(onFilter() != CategoryFilter.All) // call filter function and use value to set column view
             }} 

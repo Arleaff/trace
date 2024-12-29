@@ -2,8 +2,9 @@
 
 import CategoryColumn from "@/components/column";
 import MediaCard, { StaticMediaCard } from "@/components/rating-card";
-import {  DndContext, DragOverlay, MeasuringStrategy } from "@dnd-kit/core";
+import {  closestCenter, DndContext, DragOverlay, KeyboardSensor, MeasuringStrategy, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { DropAnimationSideEffects, KeyframeResolver } from "@dnd-kit/core/dist/components/DragOverlay/hooks/useDropAnimation";
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
 
 import { useState } from "react";
@@ -66,7 +67,7 @@ export default function Home() {
   }
 
 
-  const [activeMedia, setActiveMedia] = useState<{title: string, rating: number | undefined} | null>(null);
+  const [activeMedia, setActiveMedia] = useState<{title: string, rating: number | undefined, category: string} | null>(null);
 
   const measuringConfig = {
     droppable: {
@@ -136,46 +137,57 @@ export default function Home() {
     };
   };
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
 
   return (
     <div className="flex flex-row h-dvh p-8 overflow-hidden">
 
       <DndContext
-        autoScroll={false}
-        measuring={measuringConfig}
+        sensors={sensors}
+        // measuring={measuringConfig}
+        collisionDetection={closestCenter}
         onDragStart={
           (event) => {
             console.log(event);
             
-            const { rating } = (event.active.data.current as { rating: number | undefined })
+            const { rating, category } = (event.active.data.current as { rating: number | undefined, category: string })
             const title = event.active.id
-            setActiveMedia({ title: title as string, rating: rating } )
+            setActiveMedia({ title: title as string, rating, category } )
           }
         }
         onDragEnd={
-          (event) => {            
-            setActiveMedia(null)
-            const { category, rating } = (event.active.data.current as { category: string, rating: number | undefined})
-            const title = event.active.id
+          (event) => {
             
-            const newCategory = event.over?.id as string
-
-            if (category == newCategory) {
-              return
-            }
-
-            const { media: oldMedia, setMedia: setOldMedia} = categories[category]
-            const { media: newMedia, setMedia: setNewMedia } = categories[newCategory]
-
-            setOldMedia(oldMedia.filter(media => media.title != title))
-            // consider small delay here as opposed to animation
-            setTimeout( () => {
-              setNewMedia([...newMedia, { title: title, rating: rating }])
-
-            }, 150)
-
+            setActiveMedia(null)
           }
         }
+        onDragOver={ (event) => {
+          const { category, rating } = (event.active.data.current as { category: string, rating: number | undefined })
+          const title = event.active.id          
+
+          const newCategory = (event.over?.data.current?.category || event.over?.id) as string         
+
+          if (category == newCategory || !newCategory) {
+            return
+          }
+          
+          console.log(event);
+          
+
+          const { media: oldMedia, setMedia: setOldMedia } = categories[category]
+          const { media: newMedia, setMedia: setNewMedia } = categories[newCategory]
+
+          setActiveMedia({ title: title as string, rating, category: newCategory })
+
+          setOldMedia(oldMedia.filter(media => media.title != title))
+          setNewMedia([...newMedia, { title, rating, category }])
+        }}
         >
 
           
@@ -183,36 +195,36 @@ export default function Home() {
           
           Object.keys(categories).map(category =>
           (filter == CategoryFilter.All || filter == (CategoryFilter as any)[category]) &&
-            <CategoryColumn
-              onFilter={ () => {
+
+
+              <SortableContext
+                key={category}
+                id={category}
+                items={categories[category].media.sort((a, b) => a.title.localeCompare(b.title)).map((item) => item.title)}
+                strategy={verticalListSortingStrategy}
+
+              >            
+              
+              <CategoryColumn
+                hover={activeMedia?.category == category}
+                onFilter={() => {
                   const newFilter: CategoryFilter = filter == CategoryFilter.All ? (CategoryFilter as any)[category] : CategoryFilter.All
                   setFilter(newFilter)
                   return newFilter
-              }}
-              categoryName={category} key={category} hoverColor={ categories[category].hoverColor 
-            }>
-              {categories[category].media.sort((a, b) => a.title.localeCompare(b.title)).map((media) => <MediaCard category={category} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
-            </CategoryColumn>
+                }}
+                categoryName={category} key={category} hoverColor={categories[category].hoverColor
+                }>
+                  {categories[category].media.sort((a, b) => a.title.localeCompare(b.title)).map((media) => <MediaCard category={category} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
+                </CategoryColumn>
+
+                </SortableContext>
+
+              
           )
         }
-        <DragOverlay 
-          dropAnimation={{ duration: 500, easing: "ease-in-out",
-            keyframes: defaultKeyframeResolver,
-            sideEffects: defaultDropAnimationSideEffects({
-              styles: {
-                active: {
-                  opacity: ".5"
-                },
-              },
-              className: {
-                active: "card"
-              }
-            }),
-          }}
-        >
-          {activeMedia &&<StaticMediaCard category={""} title={activeMedia.title} rating={activeMedia.rating} ></StaticMediaCard>}
+        <DragOverlay>
+          {activeMedia && <StaticMediaCard category={""} title={activeMedia.title} rating={activeMedia.rating} ></StaticMediaCard>}
         </DragOverlay>
-
 
       </DndContext>
 
