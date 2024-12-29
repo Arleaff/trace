@@ -13,22 +13,24 @@ export default function CategoryColumn({ children, categoryName, hoverColor, hov
 
     const [ columnView, setColumnView ] = useState(true)
 
-    const { isOver, setNodeRef } = useDroppable({
+    const { setNodeRef } = useDroppable({
         id: categoryName,
     });
 
     const style: React.CSSProperties = {
         backgroundColor: hover ? hoverColor : "white",
-        transition: "all ease-in-out .5s",
+        transition: "background-color ease-in-out .5s",
     };
 
+
     return (
-        <div id={categoryName} ref={setNodeRef} style={style} className="flex flex-col p-2 w-screen rounded-xl">
+        <div id={categoryName} ref={setNodeRef} style={style} className="flex flex-1 flex-col p-2 rounded-xl overflow-x-hidden min-w-56">
+            
             <span onClick={ () => {
                 setColumnView(onFilter() != CategoryFilter.All) // call filter function and use value to set column view
             }} 
             className=" border rounded-lg w-fit px-5 hover:cursor-pointer bg-white mb-3"
-        >{categoryName}</span>
+            >{categoryName}</span>
 
             <div className=' no-scrollbar h-dvh overflow-y-scroll'>
                 <div className='flex flex-col flex-nowrap gap-3'>

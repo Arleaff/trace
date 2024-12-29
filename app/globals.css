@@ -5,7 +5,7 @@
 
 /* animates on category change, may be */
 
-@keyframes ringAnimation {
+/* @keyframes ringAnimation {
   0% {
     stroke-dashoffset: 157.07963267948966;
   }
@@ -13,7 +13,7 @@
 
 .progress { 
   animation: 1s ease-in-out 0s 1 ringAnimation;
-}
+} */
 
 
 /* Animates on start, def don't want this bug */

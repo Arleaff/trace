@@ -2,7 +2,7 @@
 import { useDraggable } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { RefObject, useRef } from 'react';
+import { RefObject, useEffect, useRef } from 'react';
 
 
 
@@ -12,6 +12,7 @@ function ProgressCircle({rating} : {rating: number | undefined}) {
     const radius = 25
     const dashArray = radius * 2 * Math.PI
     const strokeWidth = 8
+
     return (
         <svg width={size} height={size} className="flex flex-none">
             <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
@@ -25,7 +26,7 @@ function ProgressCircle({rating} : {rating: number | undefined}) {
 
 
 export default function MediaCard( { title, rating, category }: { title: string, rating: number | undefined, category: string}) {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    const { attributes, listeners, setNodeRef, transition, isDragging } = useSortable({
         id: title,
         data: { rating: rating, category: category },
     });
@@ -36,12 +37,14 @@ export default function MediaCard( { title, rating, category }: { title: string,
         opacity: isDragging ? "0.5" : "1",
     };
 
+
+
     return ( 
         <div
             ref={setNodeRef}
             style={style}
             {...listeners} {...attributes} aria-describedby=''
-            className=" flex flex-1 flex-row items-center border-2 rounded-xl px-3 max-w-sm py-2 select-none shadow-sm hover:shadow-md bg-white">
+            className="flex flex-row flex-1 items-center border-2 rounded-xl px-3 max-w-sm py-2 select-none shadow-sm hover:shadow-md bg-white">
             <ProgressCircle rating={rating}></ProgressCircle>
             <span className=" ml-4 line-clamp-2">{title}</span>
         </div>
