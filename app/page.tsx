@@ -1,6 +1,6 @@
 "use client"
 
-import CategoryColumn from "@/components/column";
+import CompletionLevelColumn from "@/components/column";
 import MediaCard, { StaticMediaCard } from "@/components/rating-card";
 import SideBar from "@/components/sidebar";
 import { closestCenter, DndContext, DragOverlay, KeyboardSensor, MeasuringStrategy, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -10,13 +10,12 @@ import { CSS } from '@dnd-kit/utilities';
 
 import { useEffect, useState } from "react";
 
-
-
-
-
 export default function Home() {
 
-  const [filter, setFilter] = useState(CategoryFilter.All)
+  const [filter, setFilter] = useState<CompletionLevels | null>(null)
+
+  console.log(filter);
+  
 
   const [unstarted, setUnstarted] = useState([
     { title: "Bleach", rating: undefined },
@@ -47,7 +46,7 @@ export default function Home() {
   ])
 
 
-  const categories: CategoryMap = {
+  const media: MediaMap = {
     "Unstarted": {
       hoverColor: "rgb(128 128 128 / .1)",
       media: unstarted,
@@ -74,7 +73,7 @@ export default function Home() {
 
 
 
-  const [activeMedia, setActiveMedia] = useState<{ title: string, rating: number | undefined, category: string } | null>(null);
+  const [activeMedia, setActiveMedia] = useState<{ title: string, rating: number | undefined, completionLevel: string } | null>(null);
 
   const measuringConfig = {
     droppable: {
@@ -175,7 +174,7 @@ export default function Home() {
     // w-dvw is needed for something..?
     <div className="flex flex-row h-dvh ">
       <SideBar></SideBar>
-      <div className="flex flex-1 flex-row h-dvh p-4 overflow-hidden">
+      <div className="flex flex-1 flex-row h-dvh p-4 overflow-y-hidden">
 
         <DndContext
           sensors={sensors}
@@ -184,9 +183,9 @@ export default function Home() {
           onDragStart={
             (event) => {
 
-              const { rating, category } = (event.active.data.current as { rating: number | undefined, category: string })
+              const { rating, completionLevel } = (event.active.data.current as { rating: number | undefined, completionLevel: string })
               const title = event.active.id
-              setActiveMedia({ title: title as string, rating, category })
+              setActiveMedia({ title: title as string, rating, completionLevel: completionLevel })
             }
           }
           onDragEnd={
@@ -195,60 +194,63 @@ export default function Home() {
             }
           }
           onDragOver={(event) => {
-            const { category, rating } = (event.active.data.current as { category: string, rating: number | undefined })
+            const { completionLevel, rating } = (event.active.data.current as { completionLevel: string, rating: number | undefined })
             const title = event.active.id
 
-            const newCategory = (event.over?.data.current?.category || event.over?.id) as string
+            const newCompletionLevel = (event.over?.data.current?.completionLevel || event.over?.id) as string
 
-            if (category == newCategory || !newCategory) {
+            if (completionLevel == newCompletionLevel || !newCompletionLevel) {
               return
             }
 
-            const { media: oldMedia, setMedia: setOldMedia } = categories[category]
-            const { media: newMedia, setMedia: setNewMedia } = categories[newCategory]
+            const { media: oldMedia, setMedia: setOldMedia } = media[completionLevel]
+            const { media: newMedia, setMedia: setNewMedia } = media[newCompletionLevel]
 
-            setActiveMedia({ title: title as string, rating, category: newCategory })
+            setActiveMedia({ title: title as string, rating, completionLevel: newCompletionLevel })
 
             setOldMedia(oldMedia.filter(media => media.title != title))
-            setNewMedia([...newMedia, { title, rating, category }])
+            setNewMedia([...newMedia, { title, rating, completionLevel }])
           }}
         >
 
 
           {
 
-            Object.keys(categories).map(category =>
-              (filter == CategoryFilter.All || filter == (CategoryFilter as any)[category]) &&
+            Object.keys(media).map(completionLevel =>
+              ((filter == null || filter as string == completionLevel) &&
 
 
 
-              <CategoryColumn
-                hover={activeMedia?.category == category}
+              <CompletionLevelColumn
+                hover={activeMedia?.completionLevel == completionLevel}
                 onFilter={() => {
-                  const newFilter: CategoryFilter = filter == CategoryFilter.All ? (CategoryFilter as any)[category] : CategoryFilter.All
-                  setFilter(newFilter)
+                  const newFilter: CompletionLevels | null = filter ? null : completionLevel as CompletionLevels 
+                  
+                  setFilter(newFilter as CompletionLevels)
                   return newFilter
                 }}
-                categoryName={category} key={category} hoverColor={categories[category].hoverColor
+                completionLevel={completionLevel} key={completionLevel} hoverColor={media[completionLevel].hoverColor
                 }>
                 <SortableContext
-                  key={category}
-                  id={category}
-                  items={categories[category].media.sort((a, b) => a.title.localeCompare(b.title)).map((item) => item.title)}
+                  key={completionLevel}
+                  id={completionLevel}
+                  items={media[completionLevel].media.sort((a, b) => a.title.localeCompare(b.title)).map((item) => item.title)}
                   strategy={verticalListSortingStrategy}
 
                 >
-                  {categories[category].media.sort((a, b) => a.title.localeCompare(b.title)).map((media) => <MediaCard category={category} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
+                  {media[completionLevel].media.sort((a, b) => a.title.localeCompare(b.title)).map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
                 </SortableContext>
 
-              </CategoryColumn>
+              </CompletionLevelColumn>
+              
+            )
 
 
 
             )
           }
           <DragOverlay>
-            {activeMedia && <StaticMediaCard category={""} title={activeMedia.title} rating={activeMedia.rating} ></StaticMediaCard>}
+            {activeMedia && <StaticMediaCard title={activeMedia.title} rating={activeMedia.rating} ></StaticMediaCard>}
           </DragOverlay>
 
         </DndContext>
@@ -259,15 +261,13 @@ export default function Home() {
   );
 }
 
-export enum CategoryFilter {
-  Unstarted,
-  Ongoing,
-  Finished,
-  Dropped,
-  All
-}
+export type CompletionLevels =
+  | 'Unstarted'
+  | 'Ongoing'
+  | 'Finished'
+  | 'Dropped'
 
-interface CategoryMap {
+interface MediaMap {
   [key: string]: {
     hoverColor: string,
     media: {

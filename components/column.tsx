@@ -1,20 +1,20 @@
 "use client";
 
-import { CategoryFilter } from '@/app/page';
+import { CompletionLevels } from '@/app/page';
 import { useDroppable } from '@dnd-kit/core';
 import { useState } from 'react';
 
 
-export default function CategoryColumn({ children, categoryName, hoverColor, hover, onFilter }: 
+export default function CompletionLevelColumn({ children, completionLevel, hoverColor, hover, onFilter }: 
     {
-        children?: React.ReactNode, categoryName: string, hoverColor: string, onFilter: () => CategoryFilter, hover: boolean
+        children?: React.ReactNode, completionLevel: string, hoverColor: string, onFilter: () => CompletionLevels | null, hover: boolean
 
 }) {
 
     const [ gridView, setGridView ] = useState(false)
 
     const { setNodeRef } = useDroppable({
-        id: categoryName,
+        id: completionLevel,
     });
 
     const categoryStyle: React.CSSProperties = {
@@ -28,19 +28,19 @@ export default function CategoryColumn({ children, categoryName, hoverColor, hov
         justifyItems: gridView ? "center" : undefined
 
 
-    };
+    };    
 
 
     return (
         // TODO: apply min width at a higher level
         // overflow-x-hidden prevents break on rerender
-        <div id={categoryName} ref={setNodeRef} style={categoryStyle} className="flex flex-1 flex-col p-2 rounded-xl overflow-x-hidden min-w-56">
+        <div id={completionLevel} ref={setNodeRef} style={categoryStyle} className="flex flex-1 flex-col p-2 rounded-xl overflow-x-hidden min-w-56">
             
             <span onClick={ () => {
-                setGridView(onFilter() != CategoryFilter.All) // call filter function and use value to set column view
+                setGridView(onFilter() != null) // call filter function and use value to set column view
             }} 
                 className="border rounded-lg w-fit px-5 hover:cursor-pointer bg-white mb-3 select-none"
-            >{categoryName}</span>
+            >{completionLevel}</span>
             
             <div className='no-scrollbar h-dvh overflow-y-scroll' >
                 <div className='flex flex-col flex-nowrap gap-3' style={mediaContainerStyle}>
