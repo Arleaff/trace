@@ -8,12 +8,13 @@ export default function SideBar() {
     const style: React.CSSProperties = {
         width: "200px",
         marginLeft: open ? "0px" : "-200px",
-        transition: "all ease .5s"
+        transition: "all ease .5s",
+        marginTop: "48px"
     }
 
     return (
         <div className="flex-none flex flex-row items-start transition-all">
-            <div className=" mt-10" style={style}>
+            <div className="px-4 box-border" style={style}>
                 <ul>
                 <li>List 1</li>
                 <li>List 2</li>
@@ -21,7 +22,7 @@ export default function SideBar() {
                 </ul>
             </div>
             <Image 
-                className="dark:invert hover:cursor-pointer" src="/menu.svg" alt="Menu" width={40} height={40} 
+                className="dark:invert hover:cursor-pointer m-2 box-border" src="/menu.svg" alt="Menu" width={40} height={40} 
                 onClick={ () => {
                     setOpen(!open)
                 }}
