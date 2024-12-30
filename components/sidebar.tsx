@@ -9,16 +9,15 @@ export default function SideBar() {
         width: "200px",
         marginLeft: open ? "0px" : "-200px",
         transition: "all ease .5s",
-        marginTop: "48px"
     }
 
     return (
         <div className="flex-none flex flex-row items-start transition-all">
-            <div className="px-4 box-border" style={style}>
+            <div className="px-4 box-border mt-14" style={style}>
                 <ul>
-                <li>List 1</li>
-                <li>List 2</li>
-                <li>List 3</li>
+                    <li>List 1</li>
+                    <li>List 2</li>
+                    <li>List 3</li>
                 </ul>
             </div>
             <Image 
