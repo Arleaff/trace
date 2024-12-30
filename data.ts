@@ -1,12 +1,8 @@
-import { CompletionLevels } from "./app/page";
+import { CompletionLevels, media } from "./app/page";
 
-const MEDIA_LISTS: {
+export const MEDIA_LISTS: {
     listName: string;
-    media: {
-        title: string;
-        rating: null | number;
-        completionLevel: CompletionLevels;
-    }[];
+    media: media[];
 }[] = [ 
     {   listName: "Anime",
         media: [
@@ -54,5 +50,3 @@ const MEDIA_LISTS: {
         ]
     }
 ]
-
-console.log(MEDIA_LISTS);

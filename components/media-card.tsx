@@ -2,12 +2,12 @@
 import { useDraggable } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { RefObject, useEffect, useRef } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 
 
 
 
-function ProgressCircle({rating} : {rating: number | undefined}) {
+function ProgressCircle({rating} : {rating: number | null}) {
     const size = 60
     const radius = 25
     const dashArray = radius * 2 * Math.PI
@@ -25,11 +25,15 @@ function ProgressCircle({rating} : {rating: number | undefined}) {
 }
 
 
-export default function MediaCard( { title, rating, completionLevel }: { title: string, rating: number | undefined, completionLevel: string}) {
-    const { attributes, listeners, setNodeRef, transition, isDragging } = useSortable({
+export default function MediaCard( { title, rating, completionLevel }: { title: string, rating: number | null, completionLevel: string}) {
+
+    const [hover, setHover] = useState(true)
+
+    const { attributes, listeners, setNodeRef, transition, isDragging, active } = useSortable({
         id: title,
         data: { rating: rating, completionLevel },
-    });
+        // disabled: hover,
+    });    
 
     const style: React.CSSProperties = {
         // transform: CSS.Transform.toString(transform),

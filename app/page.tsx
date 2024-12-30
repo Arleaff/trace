@@ -1,8 +1,9 @@
 "use client"
 
 import CompletionLevelColumn from "@/components/column";
-import MediaCard, { StaticMediaCard } from "@/components/rating-card";
+import MediaCard, { StaticMediaCard } from "@/components/media-card";
 import SideBar from "@/components/sidebar";
+import { MEDIA_LISTS } from "@/data";
 import { closestCenter, DndContext, DragOverlay, KeyboardSensor, MeasuringStrategy, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { DropAnimationSideEffects, KeyframeResolver } from "@dnd-kit/core/dist/components/DragOverlay/hooks/useDropAnimation";
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -14,36 +15,17 @@ export default function Home() {
 
   const [filter, setFilter] = useState<CompletionLevels | null>(null)
 
-  console.log(filter);
   
 
-  const [unstarted, setUnstarted] = useState([
-    { title: "Bleach", rating: undefined },
-    { title: "HxH", rating: undefined }
-  ])
+  const currentList = MEDIA_LISTS[0].media
 
-  const [ongoing, setOngoing] = useState([
-    { title: "Naruto", rating: 8.5 },
-    { title: "Re:Zero", rating: 9.5 },
-    { title: "That Time I Got Reincarnated as a Slime", rating: 8 }
-  ])
+  const [unstarted, setUnstarted] = useState(currentList.filter(media => media.completionLevel == "Unstarted"))
 
-  const [finished, setFinished] = useState([
-    { title: "Attack on Titan", rating: 10 },
-    { title: "Cyberpunk Edgerunners", rating: 10 },
-    { title: "Vinland Sage", rating: 10 },
-    { title: "One Punch Man", rating: 7 },
-    { title: "JJK", rating: 8.5 },
-    { title: "Dandadan", rating: 8.5 },
-    { title: "Kaiju No. 8", rating: 8.5 },
-    { title: "Chainsaw Man", rating: 9 },
-    { title: "Frieren", rating: 7.5 },
-  ])
+  const [ongoing, setOngoing] = useState(currentList.filter(media => media.completionLevel == "Ongoing"))
 
-  const [dropped, setDropped] = useState([
-    { title: "Tower of God", rating: 7 },
-    { title: "Made in Abyss", rating: 8 }
-  ])
+  const [finished, setFinished] = useState(currentList.filter(media => media.completionLevel == "Finished"))
+
+  const [dropped, setDropped] = useState(currentList.filter(media => media.completionLevel == "Dropped"))
 
 
   const media: MediaMap = {
@@ -58,7 +40,6 @@ export default function Home() {
       setMedia: setOngoing
     },
     "Finished": {
-
       hoverColor: "rgb( 64 201 103 / .15)",
       media: finished,
       setMedia: setFinished
@@ -75,76 +56,57 @@ export default function Home() {
 
   const [activeMedia, setActiveMedia] = useState<{ title: string, rating: number | undefined, completionLevel: string } | null>(null);
 
+  // console.log(activeMedia);
+  
+
   const measuringConfig = {
     droppable: {
       strategy: MeasuringStrategy.Always,
     }
   };
 
-  const defaultKeyframeResolver: KeyframeResolver = ({
-    transform: { initial, final },
+  function customCoordinatesGetter(event: { code: any; }, args: any) {
 
-  }) => {
-    return [
-      {
-        transform: CSS.Transform.toString(initial),
-      },
-      {
-        transform: (CSS.Transform).toString(final),
-      },
-    ]
+    
+    const { currentCoordinates } = args;
+
+    // console.log(event);
+    
+    console.log(args.context.active.data.current.completionLevel);
+    
+
+    const delta = 50;
+
+    switch (event.code) {
+      case 'ArrowRight':
+        return {
+          ...currentCoordinates,
+          x: currentCoordinates.x + delta,
+        };
+      case 'ArrowLeft':
+        return {
+          ...currentCoordinates,
+          x: currentCoordinates.x - delta,
+        };
+      case 'ArrowDown':
+        return {
+          ...currentCoordinates,
+          y: currentCoordinates.y + delta,
+        };
+      case 'ArrowUp':
+        return {
+          ...currentCoordinates,
+          y: currentCoordinates.y - delta,
+        };
+    }
+
+    return undefined;
   };
-
-  const defaultDropAnimationSideEffects = (
-    options: { styles: any; className: any; }
-  ): DropAnimationSideEffects => ({ active, dragOverlay }) => {
-    const originalStyles: Record<string, string> = {};
-    const { styles, className } = options;
-
-    if (styles?.active) {
-      for (const [key, value] of Object.entries(styles.active)) {
-        if (value === undefined) {
-          continue;
-        }
-
-        originalStyles[key] = active.node.style.getPropertyValue(key);
-        active.node.style.setProperty(key, value as string);
-      }
-    }
-
-    if (styles?.dragOverlay) {
-      for (const [key, value] of Object.entries(styles.dragOverlay)) {
-        if (value === undefined) {
-          continue;
-        }
-
-        dragOverlay.node.style.setProperty(key, value as string);
-      }
-    }
-
-    if (className?.active) {
-      active.node.classList.add(className.active);
-    }
-
-    if (className?.dragOverlay) {
-      dragOverlay.node.classList.add(className.dragOverlay);
-    }
-
-    return function cleanup() {
-      for (const [key, value] of Object.entries(originalStyles)) {
-        active.node.style.setProperty(key, value);
-      }
-
-      if (className?.active) {
-        active.node.classList.remove(className.active);
-      }
-    };
-  };
-
+  
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+      coordinateGetter: customCoordinatesGetter,
     })
   );
 
@@ -185,7 +147,7 @@ export default function Home() {
 
               const { rating, completionLevel } = (event.active.data.current as { rating: number | undefined, completionLevel: string })
               const title = event.active.id
-              setActiveMedia({ title: title as string, rating, completionLevel: completionLevel })
+              setActiveMedia({ title: title as string, rating, completionLevel })
             }
           }
           onDragEnd={
@@ -216,8 +178,8 @@ export default function Home() {
 
           {
 
-            Object.keys(media).map(completionLevel =>
-              ((filter == null || filter as string == completionLevel) &&
+            COMPLETION_LEVELS.map(completionLevel =>
+              ((filter == null || filter == completionLevel) &&
 
 
 
@@ -261,19 +223,25 @@ export default function Home() {
   );
 }
 
-export type CompletionLevels =
-  | 'Unstarted'
-  | 'Ongoing'
-  | 'Finished'
-  | 'Dropped'
+export const COMPLETION_LEVELS = ['Unstarted', 'Ongoing', 'Finished', 'Dropped'] as const;
+export type CompletionLevels = typeof COMPLETION_LEVELS[number];
+
+// export type CompletionLevels =
+//   | 'Unstarted'
+//   | 'Ongoing'
+//   | 'Finished'
+//   | 'Dropped'
+
+export type media = {
+  title: string;
+  rating: null | number;
+  completionLevel: CompletionLevels;
+}
 
 interface MediaMap {
   [key: string]: {
     hoverColor: string,
-    media: {
-      title: string;
-      rating: number | undefined;
-    }[],
+    media: media[],
     setMedia: any
   }
 }
