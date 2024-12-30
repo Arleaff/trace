@@ -175,7 +175,7 @@ export default function Home() {
     // w-dvw is needed for something..?
     <div className="flex flex-row h-dvh ">
       <SideBar></SideBar>
-      <div className="flex flex-1 flex-row h-dvh p-4 pl-0 overflow-hidden">
+      <div className="flex flex-1 flex-row h-dvh p-4 overflow-hidden">
 
         <DndContext
           sensors={sensors}

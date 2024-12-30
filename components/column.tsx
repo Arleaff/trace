@@ -39,7 +39,7 @@ export default function CategoryColumn({ children, categoryName, hoverColor, hov
             <span onClick={ () => {
                 setGridView(onFilter() != CategoryFilter.All) // call filter function and use value to set column view
             }} 
-            className="border rounded-lg w-fit px-5 hover:cursor-pointer bg-white mb-3"
+                className="border rounded-lg w-fit px-5 hover:cursor-pointer bg-white mb-3 select-none"
             >{categoryName}</span>
             
             <div className='no-scrollbar h-dvh overflow-y-scroll' >
