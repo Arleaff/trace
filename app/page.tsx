@@ -10,6 +10,7 @@ import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrate
 import { CSS } from '@dnd-kit/utilities';
 
 import { useEffect, useState } from "react";
+import { VList } from "virtua";
 
 export default function Home() {
 
@@ -142,6 +143,7 @@ export default function Home() {
           sensors={sensors}
           // measuring={measuringConfig}
           collisionDetection={closestCenter}
+          // autoScroll={false}
           onDragStart={
             (event) => {
 
@@ -155,16 +157,32 @@ export default function Home() {
               setActiveMedia(null)
             }
           }
-          onDragOver={(event) => {
-            const { completionLevel, rating } = (event.active.data.current as { completionLevel: string, rating: number | undefined })
+          onDragOver={(event) => {            
+            const { completionLevel, rating } = activeMedia!
+            
+
             const title = event.active.id
 
-            const newCompletionLevel = (event.over?.data.current?.completionLevel || event.over?.id) as string
+            const overContainer = event.over?.id
+            const overItems = event.over?.data.current?.completionLevel
+            
 
-            if (completionLevel == newCompletionLevel || !newCompletionLevel) {
+            let newCompletionLevel: CompletionLevels | null = null
+
+
+            if (COMPLETION_LEVELS.includes(overContainer as CompletionLevels)) {
+              newCompletionLevel = overContainer as CompletionLevels
+              
+              
+            }
+            else if (COMPLETION_LEVELS.includes(overItems as CompletionLevels)) {
+              newCompletionLevel = overItems
+            }            
+  
+
+            if (completionLevel == newCompletionLevel || newCompletionLevel == null) {
               return
             }
-
             const { media: oldMedia, setMedia: setOldMedia } = media[completionLevel]
             const { media: newMedia, setMedia: setNewMedia } = media[newCompletionLevel]
 
@@ -183,16 +201,7 @@ export default function Home() {
 
 
 
-              <CompletionLevelColumn
-                hover={activeMedia?.completionLevel == completionLevel}
-                onFilter={() => {
-                  const newFilter: CompletionLevels | null = filter ? null : completionLevel as CompletionLevels 
-                  
-                  setFilter(newFilter as CompletionLevels)
-                  return newFilter
-                }}
-                completionLevel={completionLevel} key={completionLevel} hoverColor={media[completionLevel].hoverColor
-                }>
+
                 <SortableContext
                   key={completionLevel}
                   id={completionLevel}
@@ -200,10 +209,21 @@ export default function Home() {
                   strategy={verticalListSortingStrategy}
 
                 >
-                  {media[completionLevel].media.sort((a, b) => a.title.localeCompare(b.title)).map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
+                  <CompletionLevelColumn
+                    hover={activeMedia?.completionLevel == completionLevel}
+                    onFilter={() => {
+                      const newFilter: CompletionLevels | null = filter ? null : completionLevel as CompletionLevels
+
+                      setFilter(newFilter as CompletionLevels)
+                      return newFilter
+                    }}
+                    completionLevel={completionLevel} key={completionLevel} hoverColor={media[completionLevel].hoverColor
+                    }>
+                    {media[completionLevel].media.sort((a, b) => a.title.localeCompare(b.title)).map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
+           
+                  </CompletionLevelColumn>
                 </SortableContext>
 
-              </CompletionLevelColumn>
               
             )
 

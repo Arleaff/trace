@@ -3,6 +3,7 @@
 import { CompletionLevels } from '@/app/page';
 import { useDroppable } from '@dnd-kit/core';
 import { useState } from 'react';
+import { VList } from 'virtua';
 
 
 export default function CompletionLevelColumn({ children, completionLevel, hoverColor, hover, onFilter }: 
@@ -15,7 +16,7 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
 
     const { setNodeRef } = useDroppable({
         id: completionLevel,
-    });
+    });    
 
     const categoryStyle: React.CSSProperties = {
         backgroundColor: hover ? hoverColor : "white",
@@ -44,7 +45,9 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
             
             <div className='no-scrollbar h-dvh overflow-y-scroll' >
                 <div className='flex flex-col flex-nowrap gap-3' style={mediaContainerStyle}>
-                    {children}
+                    <VList style={{height: 800}}>
+                        {children}
+                    </VList>                    
                 </div>
             </div>
             
