@@ -11,29 +11,38 @@ export default function CategoryColumn({ children, categoryName, hoverColor, hov
 
 }) {
 
-    const [ columnView, setColumnView ] = useState(true)
+    const [ gridView, setGridView ] = useState(false)
 
     const { setNodeRef } = useDroppable({
         id: categoryName,
     });
 
-    const style: React.CSSProperties = {
+    const categoryStyle: React.CSSProperties = {
         backgroundColor: hover ? hoverColor : "white",
         transition: "background-color ease-in-out .5s",
     };
 
+    const mediaContainerStyle: React.CSSProperties = {
+        display: gridView ? "grid" : 'flex',
+        gridTemplateColumns: gridView ? "repeat(auto-fill, minmax(300px, 1fr))" : undefined,
+
+
+    };
+
 
     return (
-        <div id={categoryName} ref={setNodeRef} style={style} className="flex flex-1 flex-col p-2 rounded-xl overflow-x-hidden min-w-56">
+        // TODO: apply min width at a higher level
+        // overflow-x-hidden prevents break on rerender
+        <div id={categoryName} ref={setNodeRef} style={categoryStyle} className="flex flex-1 flex-col p-2 rounded-xl overflow-x-hidden min-w-56">
             
             <span onClick={ () => {
-                setColumnView(onFilter() != CategoryFilter.All) // call filter function and use value to set column view
+                setGridView(onFilter() != CategoryFilter.All) // call filter function and use value to set column view
             }} 
-            className=" border rounded-lg w-fit px-5 hover:cursor-pointer bg-white mb-3"
+            className="border rounded-lg w-fit px-5 hover:cursor-pointer bg-white mb-3"
             >{categoryName}</span>
-
-            <div className=' no-scrollbar h-dvh overflow-y-scroll'>
-                <div className='flex flex-col flex-nowrap gap-3'>
+            
+            <div className='no-scrollbar h-dvh overflow-y-scroll' >
+                <div className='flex flex-col flex-nowrap gap-3' style={mediaContainerStyle}>
                     {children}
                 </div>
             </div>

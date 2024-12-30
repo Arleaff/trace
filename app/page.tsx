@@ -185,6 +185,7 @@ export default function Home() {
           sensors={sensors}
           // measuring={measuringConfig}
           collisionDetection={closestCenter}
+          autoScroll={false}
           onDragStart={
             (event) => {
               
