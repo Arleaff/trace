@@ -6,10 +6,10 @@ export default function SideBar() {
     const [ open, setOpen ] = useState(false);
 
     const style: React.CSSProperties = {
-        width: "200px",
-        marginLeft: open ? "0px" : "-200px",
+        width: open ? "200px" : "0px",
+        opacity: open ? "1" : "0",
 
-        transition: open ? "margin-left linear .4s" : "margin-left linear .5s",
+        transition: open ? "width ease .4s, opacity ease .00001s .3s" : "width ease .5s",
 
     }
 
