@@ -44,7 +44,7 @@ export default function MediaCard( { title, rating, category }: { title: string,
             ref={setNodeRef}
             style={style}
             {...listeners} {...attributes} aria-describedby=''
-            className="flex flex-row flex-1 items-center border-2 rounded-xl px-3 max-w-sm py-2 select-none shadow-sm hover:shadow-md bg-white">
+            className="flex flex-row flex-1 items-center border-2 rounded-xl px-3 max-w-sm py-2 select-none shadow-sm hover:shadow-md bg-white w-full">
             <ProgressCircle rating={rating}></ProgressCircle>
             <span className=" ml-4 line-clamp-2">{title}</span>
         </div>

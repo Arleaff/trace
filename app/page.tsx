@@ -179,7 +179,7 @@ export default function Home() {
           height={40}
         />
       </div>
-      <div className="flex flex-1 flex-row h-dvh p-4 min-w-0 overflow-hidden">
+      <div className="flex flex-1 flex-row h-dvh p-4 overflow-hidden">
 
         <DndContext
           sensors={sensors}
