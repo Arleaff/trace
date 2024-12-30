@@ -25,7 +25,7 @@ export default function CategoryColumn({ children, categoryName, hoverColor, hov
     const mediaContainerStyle: React.CSSProperties = {
         display: gridView ? "grid" : 'flex',
         gridTemplateColumns: gridView ? "repeat(auto-fill, minmax(300px, 1fr))" : undefined,
-        justifyItems: gridView ? "center" : undefined,
+        justifyItems: gridView ? "center" : undefined
 
 
     };

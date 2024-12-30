@@ -2,16 +2,20 @@
 
 import CategoryColumn from "@/components/column";
 import MediaCard, { StaticMediaCard } from "@/components/rating-card";
-import {  closestCenter, DndContext, DragOverlay, KeyboardSensor, MeasuringStrategy, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import SideBar from "@/components/sidebar";
+import { closestCenter, DndContext, DragOverlay, KeyboardSensor, MeasuringStrategy, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { DropAnimationSideEffects, KeyframeResolver } from "@dnd-kit/core/dist/components/DragOverlay/hooks/useDropAnimation";
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
-import Image from "next/image"
 
 import { useEffect, useState } from "react";
 
+
+
+
+
 export default function Home() {
-  
+
   const [filter, setFilter] = useState(CategoryFilter.All)
 
   const [unstarted, setUnstarted] = useState([
@@ -44,33 +48,33 @@ export default function Home() {
 
 
   const categories: CategoryMap = {
-      "Unstarted": {  
+    "Unstarted": {
       hoverColor: "rgb(128 128 128 / .1)",
       media: unstarted,
       setMedia: setUnstarted
-    }, 
-      "Ongoing": {
+    },
+    "Ongoing": {
       hoverColor: "rgb(82 204 207 / .2)",
       media: ongoing,
       setMedia: setOngoing
     },
-      "Finished": {
-      
+    "Finished": {
+
       hoverColor: "rgb( 64 201 103 / .15)",
       media: finished,
       setMedia: setFinished
     },
-      "Dropped": {
+    "Dropped": {
       hoverColor: "rgb(243 16 141 / .1)",
       media: dropped,
       setMedia: setDropped
     },
   }
 
-  
 
 
-  const [activeMedia, setActiveMedia] = useState<{title: string, rating: number | undefined, category: string} | null>(null);
+
+  const [activeMedia, setActiveMedia] = useState<{ title: string, rating: number | undefined, category: string } | null>(null);
 
   const measuringConfig = {
     droppable: {
@@ -80,8 +84,8 @@ export default function Home() {
 
   const defaultKeyframeResolver: KeyframeResolver = ({
     transform: { initial, final },
-    
-  }) => { 
+
+  }) => {
     return [
       {
         transform: CSS.Transform.toString(initial),
@@ -118,7 +122,7 @@ export default function Home() {
         dragOverlay.node.style.setProperty(key, value as string);
       }
     }
-    
+
     if (className?.active) {
       active.node.classList.add(className.active);
     }
@@ -160,7 +164,7 @@ export default function Home() {
       delay: 0
     };
 
-    circleProgress.forEach ( (node) => {
+    circleProgress.forEach((node) => {
       node.animate(progressAnimation, progressTiming)
     })
 
@@ -168,30 +172,21 @@ export default function Home() {
 
 
   return (
-
-    <div className="flex flex-row h-dvh">
-      <div className="flex-none">
-        <Image
-          className="dark:invert hover:cursor-pointer"
-          src="/menu.svg"
-          alt="Menu"
-          width={40}
-          height={40}
-        />
-      </div>
-      <div className="flex flex-1 flex-row h-dvh p-4 overflow-hidden">
+    // w-dvw is needed for something..?
+    <div className="flex flex-row h-dvh ">
+      <SideBar></SideBar>
+      <div className="flex flex-1 flex-row h-dvh p-4 pl-0 overflow-hidden">
 
         <DndContext
           sensors={sensors}
           // measuring={measuringConfig}
           collisionDetection={closestCenter}
-          autoScroll={false}
           onDragStart={
             (event) => {
-              
+
               const { rating, category } = (event.active.data.current as { rating: number | undefined, category: string })
               const title = event.active.id
-              setActiveMedia({ title: title as string, rating, category } )
+              setActiveMedia({ title: title as string, rating, category })
             }
           }
           onDragEnd={
@@ -199,15 +194,15 @@ export default function Home() {
               setActiveMedia(null)
             }
           }
-          onDragOver={ (event) => {
+          onDragOver={(event) => {
             const { category, rating } = (event.active.data.current as { category: string, rating: number | undefined })
-            const title = event.active.id          
+            const title = event.active.id
 
-            const newCategory = (event.over?.data.current?.category || event.over?.id) as string       
+            const newCategory = (event.over?.data.current?.category || event.over?.id) as string
 
             if (category == newCategory || !newCategory) {
               return
-            }          
+            }
 
             const { media: oldMedia, setMedia: setOldMedia } = categories[category]
             const { media: newMedia, setMedia: setNewMedia } = categories[newCategory]
@@ -217,39 +212,39 @@ export default function Home() {
             setOldMedia(oldMedia.filter(media => media.title != title))
             setNewMedia([...newMedia, { title, rating, category }])
           }}
-          >
+        >
 
-            
+
           {
-            
+
             Object.keys(categories).map(category =>
-            (filter == CategoryFilter.All || filter == (CategoryFilter as any)[category]) &&
-
-         
-                
-                <CategoryColumn
-                  hover={activeMedia?.category == category}
-                  onFilter={() => {
-                    const newFilter: CategoryFilter = filter == CategoryFilter.All ? (CategoryFilter as any)[category] : CategoryFilter.All
-                    setFilter(newFilter)
-                    return newFilter
-                  }}
-                  categoryName={category} key={category} hoverColor={categories[category].hoverColor
-                  }>
-                    <SortableContext
-                      key={category}
-                      id={category}
-                      items={categories[category].media.sort((a, b) => a.title.localeCompare(b.title)).map((item) => item.title)}
-                      strategy={verticalListSortingStrategy}
-
-                    >    
-                    {categories[category].media.sort((a, b) => a.title.localeCompare(b.title)).map((media) => <MediaCard category={category} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
-                    </SortableContext>
-
-                  </CategoryColumn>
+              (filter == CategoryFilter.All || filter == (CategoryFilter as any)[category]) &&
 
 
-                
+
+              <CategoryColumn
+                hover={activeMedia?.category == category}
+                onFilter={() => {
+                  const newFilter: CategoryFilter = filter == CategoryFilter.All ? (CategoryFilter as any)[category] : CategoryFilter.All
+                  setFilter(newFilter)
+                  return newFilter
+                }}
+                categoryName={category} key={category} hoverColor={categories[category].hoverColor
+                }>
+                <SortableContext
+                  key={category}
+                  id={category}
+                  items={categories[category].media.sort((a, b) => a.title.localeCompare(b.title)).map((item) => item.title)}
+                  strategy={verticalListSortingStrategy}
+
+                >
+                  {categories[category].media.sort((a, b) => a.title.localeCompare(b.title)).map((media) => <MediaCard category={category} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
+                </SortableContext>
+
+              </CategoryColumn>
+
+
+
             )
           }
           <DragOverlay>
