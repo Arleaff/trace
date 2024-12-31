@@ -28,7 +28,6 @@ export default function Home() {
 
   const [dropped, setDropped] = useState(currentList.filter(media => media.completionLevel == "Dropped"))
 
-
   const media: MediaMap = {
     "Unstarted": {
       hoverColor: "rgb(128 128 128 / .1)",
@@ -55,10 +54,7 @@ export default function Home() {
 
 
 
-  const [activeMedia, setActiveMedia] = useState<{ title: string, rating: number | undefined, completionLevel: string } | null>(null);
-
-  // console.log(activeMedia);
-  
+  const [activeMedia, setActiveMedia] = useState<{ title: string, rating: number | undefined, completionLevel: string } | null>(null);  
 
   const measuringConfig = {
     droppable: {
@@ -143,7 +139,6 @@ export default function Home() {
           sensors={sensors}
           // measuring={measuringConfig}
           collisionDetection={closestCenter}
-          // autoScroll={false}
           onDragStart={
             (event) => {
 
@@ -167,20 +162,10 @@ export default function Home() {
             const overItems = event.over?.data.current?.completionLevel
             
 
-            let newCompletionLevel: CompletionLevels | null = null
-
-
-            if (COMPLETION_LEVELS.includes(overContainer as CompletionLevels)) {
-              newCompletionLevel = overContainer as CompletionLevels
-              
-              
-            }
-            else if (COMPLETION_LEVELS.includes(overItems as CompletionLevels)) {
-              newCompletionLevel = overItems
-            }            
+            let newCompletionLevel = COMPLETION_LEVELS.find(value => value == overContainer || value == overItems)     
   
 
-            if (completionLevel == newCompletionLevel || newCompletionLevel == null) {
+            if (completionLevel == newCompletionLevel || !newCompletionLevel) {
               return
             }
             const { media: oldMedia, setMedia: setOldMedia } = media[completionLevel]
@@ -207,6 +192,7 @@ export default function Home() {
                   id={completionLevel}
                   items={media[completionLevel].media.sort((a, b) => a.title.localeCompare(b.title)).map((item) => item.title)}
                   strategy={verticalListSortingStrategy}
+                  disabled={filter != null}
 
                 >
                   <CompletionLevelColumn

@@ -16,17 +16,17 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
 
     const { setNodeRef } = useDroppable({
         id: completionLevel,
-    });    
+    });
 
     const categoryStyle: React.CSSProperties = {
         backgroundColor: hover ? hoverColor : "white",
         transition: "background-color ease-in-out .5s",
     };
 
-    const mediaContainerStyle: React.CSSProperties = {
-        display: gridView ? "grid" : 'flex',
-        gridTemplateColumns: gridView ? "repeat(auto-fill, minmax(300px, 1fr))" : undefined,
-        justifyItems: gridView ? "center" : undefined
+    const gridStyle: React.CSSProperties = {
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+        justifyItems: "center"
 
 
     };    
@@ -43,13 +43,24 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
                 className="border rounded-lg w-fit px-5 hover:cursor-pointer bg-white mb-3 select-none"
             >{completionLevel}</span>
             
-            <div className='no-scrollbar h-dvh overflow-y-scroll' >
-                <div className='flex flex-col flex-nowrap gap-3' style={mediaContainerStyle}>
-                    <VList style={{height: 800}}>
+
+            { 
+                gridView ? 
+                    // consider virtualized grid using the same library
+                    <div
+                        style={gridStyle}
+                        className='gap-3'
+                    >
                         {children}
-                    </VList>                    
-                </div>
-            </div>
+                    </div>
+                :
+                    <VList
+                        className='no-scrollbar h-full overflow-y-scroll'>
+                        {children}
+                    </VList>
+
+            }
+            
             
             
         </div>

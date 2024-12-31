@@ -27,8 +27,6 @@ function ProgressCircle({rating} : {rating: number | null}) {
 
 export default function MediaCard( { title, rating, completionLevel }: { title: string, rating: number | null, completionLevel: string}) {
 
-    const [hover, setHover] = useState(true)
-
     const { attributes, listeners, setNodeRef, transition, isDragging, active } = useSortable({
         id: title,
         data: { rating: rating, completionLevel },
@@ -48,9 +46,9 @@ export default function MediaCard( { title, rating, completionLevel }: { title: 
             ref={setNodeRef}
             style={style}
             {...listeners} {...attributes} aria-describedby=''
-            className="flex flex-row flex-1 items-center border-2 rounded-xl px-3 max-w-sm py-2 select-none shadow-sm hover:shadow-md bg-white w-full">
+            className="flex flex-row flex-1 items-center border-2 rounded-xl px-3 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1">
             <ProgressCircle rating={rating}></ProgressCircle>
-            <span className=" ml-4 line-clamp-2">{title}</span>
+            <span className="ml-4 line-clamp-2">{title}</span>
         </div>
         
         
@@ -67,7 +65,7 @@ export function StaticMediaCard({ title, rating }: { title: string, rating: numb
             className='max-w-sm'
         >
             <div aria-describedby=''
-                className="flex flex-row items-center border-2 rounded-xl px-3 py-2 select-none shadow-sm hover:shadow-md bg-white">
+                className="flex flex-row items-center border-2 rounded-xl px-3 py-2 select-none shadow-sm hover:shadow-md bg-white hover:cursor-grabbing">
                 <StaticProgressCircle rating={rating}/>
                 <span className=" ml-4 line-clamp-2">{title}</span>
             </div>

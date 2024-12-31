@@ -5,8 +5,8 @@ export const MEDIA_LISTS: {
     media: media[];
 }[] = [ 
     {   listName: "Anime",
-        media: [...Array(100).keys()].map( i => { return { title: i.toString(), rating: null, completionLevel: "Ongoing" }} )
-              //     { title: "Cyberpunk Edgerunners", rating: 10, completionLevel: "Finished" },
+        media: [...Array(1000).keys()].map( i => { return { title: i.toString(), rating: null, completionLevel: "Ongoing" }} )
+        //     { title: "Cyberpunk Edgerunners", rating: 10, completionLevel: "Finished" },
         // media: [
         //     { title: "Bleach", rating: null, completionLevel: "Unstarted" },
         //     { title: "HxH", rating: null, completionLevel: "Unstarted" },
