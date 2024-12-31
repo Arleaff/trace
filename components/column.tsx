@@ -2,13 +2,14 @@
 
 import { CompletionLevels } from '@/app/page';
 import { useDroppable } from '@dnd-kit/core';
-import { useState } from 'react';
-import { VList } from 'virtua';
+import { RefObject, useEffect, useRef, useState } from 'react';
+import { VList, VListHandle } from 'virtua';
 
 
-export default function CompletionLevelColumn({ children, completionLevel, hoverColor, hover, onFilter }: 
+export default function CompletionLevelColumn({ children, completionLevel, hoverColor, hover, onFilter, VListRef }: 
     {
-        children?: React.ReactNode, completionLevel: string, hoverColor: string, onFilter: () => CompletionLevels | null, hover: boolean
+        children?: React.ReactNode, completionLevel: string, hoverColor: string, onFilter: () => CompletionLevels | null, hover: boolean,
+        VListRef: RefObject<VListHandle | null>
 
 }) {
 
@@ -55,6 +56,7 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
                     </div>
                 :
                     <VList
+                        ref={VListRef}
                         className='no-scrollbar h-full overflow-y-scroll'>
                         {children}
                     </VList>

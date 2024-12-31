@@ -9,14 +9,12 @@ import { DropAnimationSideEffects, KeyframeResolver } from "@dnd-kit/core/dist/c
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
 
-import { useEffect, useState } from "react";
-import { VList } from "virtua";
+import { RefObject, useEffect, useRef, useState } from "react";
+import { VList, VListHandle } from "virtua";
 
 export default function Home() {
 
   const [filter, setFilter] = useState<CompletionLevels | null>(null)
-
-  
 
   const currentList = MEDIA_LISTS[0].media
 
@@ -32,29 +30,33 @@ export default function Home() {
     "Unstarted": {
       hoverColor: "rgb(128 128 128 / .1)",
       media: unstarted,
-      setMedia: setUnstarted
+      setMedia: setUnstarted,
+      ref: useRef<VListHandle>(null)
     },
     "Ongoing": {
       hoverColor: "rgb(82 204 207 / .2)",
       media: ongoing,
-      setMedia: setOngoing
+      setMedia: setOngoing,
+      ref: useRef<VListHandle>(null)
     },
     "Finished": {
       hoverColor: "rgb( 64 201 103 / .15)",
       media: finished,
-      setMedia: setFinished
+      setMedia: setFinished,
+      ref: useRef<VListHandle>(null)
     },
     "Dropped": {
       hoverColor: "rgb(243 16 141 / .1)",
       media: dropped,
-      setMedia: setDropped
+      setMedia: setDropped,
+      ref: useRef<VListHandle>(null)
     },
   }
 
 
 
 
-  const [activeMedia, setActiveMedia] = useState<{ title: string, rating: number | undefined, completionLevel: string } | null>(null);  
+  const [activeMedia, setActiveMedia] = useState<media | null>(null);  
 
   const measuringConfig = {
     droppable: {
@@ -66,10 +68,6 @@ export default function Home() {
 
     
     const { currentCoordinates } = args;
-
-    // console.log(event);
-    
-    console.log(args.context.active.data.current.completionLevel);
     
 
     const delta = 50;
@@ -107,6 +105,7 @@ export default function Home() {
     })
   );
 
+  // animate rating circle on load
   useEffect(() => {
     const circleProgress = document.querySelectorAll(".progress");
 
@@ -128,6 +127,14 @@ export default function Home() {
 
   }, [])
 
+  const [currentIndex, setCurrentIndex] = useState(-1)
+
+  
+  function formatMedia(media: media[]) {
+    // for filter, search, and sort later on
+    return media.sort((a, b) => a.title.localeCompare(b.title))
+  }
+
 
   return (
     // w-dvw is needed for something..?
@@ -142,7 +149,7 @@ export default function Home() {
           onDragStart={
             (event) => {
 
-              const { rating, completionLevel } = (event.active.data.current as { rating: number | undefined, completionLevel: string })
+              const { rating, completionLevel } = (event.active.data.current as { rating: number | null, completionLevel: CompletionLevels })
               const title = event.active.id
               setActiveMedia({ title: title as string, rating, completionLevel })
             }
@@ -169,12 +176,19 @@ export default function Home() {
               return
             }
             const { media: oldMedia, setMedia: setOldMedia } = media[completionLevel]
-            const { media: newMedia, setMedia: setNewMedia } = media[newCompletionLevel]
+            const { media: currentMedia, setMedia: setCurrentMedia, ref } = media[newCompletionLevel]
 
             setActiveMedia({ title: title as string, rating, completionLevel: newCompletionLevel })
 
             setOldMedia(oldMedia.filter(media => media.title != title))
-            setNewMedia([...newMedia, { title, rating, completionLevel }])
+
+            const newMedia = [...currentMedia, activeMedia!]
+            setCurrentMedia(newMedia)
+
+            console.log(formatMedia(newMedia).indexOf(activeMedia!));
+            ref.current?.scrollToIndex(formatMedia(newMedia).indexOf(activeMedia!))
+
+
           }}
         >
 
@@ -196,6 +210,7 @@ export default function Home() {
 
                 >
                   <CompletionLevelColumn
+                    VListRef={media[completionLevel].ref}
                     hover={activeMedia?.completionLevel == completionLevel}
                     onFilter={() => {
                       const newFilter: CompletionLevels | null = filter ? null : completionLevel as CompletionLevels
@@ -205,7 +220,7 @@ export default function Home() {
                     }}
                     completionLevel={completionLevel} key={completionLevel} hoverColor={media[completionLevel].hoverColor
                     }>
-                    {media[completionLevel].media.sort((a, b) => a.title.localeCompare(b.title)).map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
+                  {formatMedia(media[completionLevel].media).map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
            
                   </CompletionLevelColumn>
                 </SortableContext>
@@ -229,6 +244,8 @@ export default function Home() {
   );
 }
 
+
+
 export const COMPLETION_LEVELS = ['Unstarted', 'Ongoing', 'Finished', 'Dropped'] as const;
 export type CompletionLevels = typeof COMPLETION_LEVELS[number];
 
@@ -248,7 +265,8 @@ interface MediaMap {
   [key: string]: {
     hoverColor: string,
     media: media[],
-    setMedia: any
+    setMedia: any,
+    ref: RefObject<VListHandle | null>
   }
 }
 

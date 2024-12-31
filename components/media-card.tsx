@@ -27,14 +27,12 @@ function ProgressCircle({rating} : {rating: number | null}) {
 
 export default function MediaCard( { title, rating, completionLevel }: { title: string, rating: number | null, completionLevel: string}) {
 
-    const { attributes, listeners, setNodeRef, transition, isDragging, active } = useSortable({
+    const { attributes, listeners, setNodeRef, transition, isDragging } = useSortable({
         id: title,
         data: { rating: rating, completionLevel },
-        // disabled: hover,
     });    
 
     const style: React.CSSProperties = {
-        // transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? "0.5" : "1",
     };
@@ -55,7 +53,7 @@ export default function MediaCard( { title, rating, completionLevel }: { title: 
     )
 }
 
-export function StaticMediaCard({ title, rating }: { title: string, rating: number | undefined }) {
+export function StaticMediaCard({ title, rating }: { title: string, rating: number | null }) {
 
 
     return (
@@ -73,7 +71,7 @@ export function StaticMediaCard({ title, rating }: { title: string, rating: numb
     )
 }
 
-function StaticProgressCircle({ rating }: { rating: number | undefined }) {
+function StaticProgressCircle({ rating }: { rating: number | null }) {
     const size = 60
     const radius = 25
     const dashArray = radius * 2 * Math.PI
