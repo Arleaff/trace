@@ -55,6 +55,7 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
                         {children}
                     </div>
                 :
+                // TODO: see if height changes performance
                     <VList
                         ref={VListRef}
                         className='no-scrollbar h-full overflow-y-scroll'>

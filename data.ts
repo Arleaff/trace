@@ -5,28 +5,28 @@ export const MEDIA_LISTS: {
     media: media[];
 }[] = [ 
     {   listName: "Anime",
-        media: [...Array(1000).keys()].map( i => { return { title: i.toString(), rating: null, completionLevel: "Ongoing" }} )
-        // media: [
-        //     { title: "Bleach", rating: null, completionLevel: "Unstarted" },
-        //     { title: "HxH", rating: null, completionLevel: "Unstarted" },
+        // media: [...Array(1000).keys()].map( i => { return { title: i.toString(), rating: null, completionLevel: "Ongoing" }} )
+        media: [
+            { title: "Bleach", rating: null, completionLevel: "Unstarted" },
+            { title: "HxH", rating: null, completionLevel: "Unstarted" },
 
-        //     { title: "Naruto", rating: 8.5, completionLevel: "Ongoing" },
-        //     { title: "Re:Zero", rating: 9.5, completionLevel: "Ongoing" },
-        //     { title: "That Time I Got Reincarnated as a Slime", rating: 8, completionLevel: "Ongoing" },
+            { title: "Naruto", rating: 8.5, completionLevel: "Ongoing" },
+            { title: "Re:Zero", rating: 9.5, completionLevel: "Ongoing" },
+            { title: "That Time I Got Reincarnated as a Slime", rating: 8, completionLevel: "Ongoing" },
 
-        //     { title: "Attack on Titan", rating: 10, completionLevel: "Finished" },
-        //     { title: "Cyberpunk Edgerunners", rating: 10, completionLevel: "Finished" },
-        //     { title: "Vinland Sage", rating: 10, completionLevel: "Finished" },
-        //     { title: "One Punch Man", rating: 7, completionLevel: "Finished" },
-        //     { title: "JJK", rating: 8.5, completionLevel: "Finished" },
-        //     { title: "Dandadan", rating: 8.5, completionLevel: "Finished" },
-        //     { title: "Kaiju No. 8", rating: 8.5, completionLevel: "Finished" },
-        //     { title: "Chainsaw Man", rating: 9, completionLevel: "Finished" },
-        //     { title: "Frieren", rating: 7.5, completionLevel: "Finished" },
+            { title: "Attack on Titan", rating: 10, completionLevel: "Finished" },
+            { title: "Cyberpunk Edgerunners", rating: 10, completionLevel: "Finished" },
+            { title: "Vinland Sage", rating: 10, completionLevel: "Finished" },
+            { title: "One Punch Man", rating: 7, completionLevel: "Finished" },
+            { title: "JJK", rating: 8.5, completionLevel: "Finished" },
+            { title: "Dandadan", rating: 8.5, completionLevel: "Finished" },
+            { title: "Kaiju No. 8", rating: 8.5, completionLevel: "Finished" },
+            { title: "Chainsaw Man", rating: 9, completionLevel: "Finished" },
+            { title: "Frieren", rating: 7.5, completionLevel: "Finished" },
 
-        //     { title: "Tower of God", rating: 7, completionLevel: "Dropped" },
-        //     { title: "Made in Abyss", rating: 8, completionLevel: "Dropped" }
-        // ]
+            { title: "Tower of God", rating: 7, completionLevel: "Dropped" },
+            { title: "Made in Abyss", rating: 8, completionLevel: "Dropped" }
+        ]
     },
 
     {   listName: "Games",

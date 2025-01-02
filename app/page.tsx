@@ -97,7 +97,9 @@ export default function Home() {
   };
   
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 1 }
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: customCoordinatesGetter,
     })
@@ -212,6 +214,8 @@ export default function Home() {
           </DragOverlay>
 
         </DndContext>
+
+        
 
 
       </div>
