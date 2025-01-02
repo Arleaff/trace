@@ -2,7 +2,7 @@
 
 import { CompletionLevels } from '@/app/page';
 import { useDroppable } from '@dnd-kit/core';
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { RefObject, useState } from 'react';
 import { VList, VListHandle } from 'virtua';
 
 

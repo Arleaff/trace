@@ -5,9 +5,7 @@ import MediaCard, { StaticMediaCard } from "@/components/media-card";
 import SideBar from "@/components/sidebar";
 import { MEDIA_LISTS } from "@/data";
 import { closestCenter, DndContext, DragOverlay, KeyboardSensor, MeasuringStrategy, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { DropAnimationSideEffects, KeyframeResolver } from "@dnd-kit/core/dist/components/DragOverlay/hooks/useDropAnimation";
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CSS } from '@dnd-kit/utilities';
 
 import { RefObject, useEffect, useRef, useState } from "react";
 import { VList, VListHandle } from "virtua";
@@ -18,13 +16,20 @@ export default function Home() {
 
   const currentList = MEDIA_LISTS[0].media
 
-  const [unstarted, setUnstarted] = useState(currentList.filter(media => media.completionLevel == "Unstarted"))
+  function formatMedia(media: media[]) {
+    // for filter, search, and sort later on
+    // .filter( media => media.title.includes("0"))
+    return media.sort((a, b) => a.title.localeCompare(b.title))
+  }
 
-  const [ongoing, setOngoing] = useState(currentList.filter(media => media.completionLevel == "Ongoing"))
+  
+  const [unstarted, setUnstarted] = useState(formatMedia(currentList.filter(media => media.completionLevel == "Unstarted")))
 
-  const [finished, setFinished] = useState(currentList.filter(media => media.completionLevel == "Finished"))
+  const [ongoing, setOngoing] = useState(formatMedia(currentList.filter(media => media.completionLevel == "Ongoing")))
 
-  const [dropped, setDropped] = useState(currentList.filter(media => media.completionLevel == "Dropped"))
+  const [finished, setFinished] = useState(formatMedia(currentList.filter(media => media.completionLevel == "Finished")))
+
+  const [dropped, setDropped] = useState(formatMedia(currentList.filter(media => media.completionLevel == "Dropped")))
 
   const media: MediaMap = {
     "Unstarted": {
@@ -57,12 +62,6 @@ export default function Home() {
 
 
   const [activeMedia, setActiveMedia] = useState<media | null>(null);  
-
-  const measuringConfig = {
-    droppable: {
-      strategy: MeasuringStrategy.Always,
-    }
-  };
 
   function customCoordinatesGetter(event: { code: any; }, args: any) {
 
@@ -111,7 +110,7 @@ export default function Home() {
 
     const progressAnimation: Keyframe[] = [
       { strokeDashoffset: "157.07963267948966" },
-      { strokeDashoffset: "" },
+      {},
     ];
 
     const progressTiming: KeyframeAnimationOptions = {
@@ -130,10 +129,7 @@ export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(-1)
 
   
-  function formatMedia(media: media[]) {
-    // for filter, search, and sort later on
-    return media.sort((a, b) => a.title.localeCompare(b.title))
-  }
+
 
 
   return (
@@ -182,12 +178,10 @@ export default function Home() {
 
             setOldMedia(oldMedia.filter(media => media.title != title))
 
-            const newMedia = [...currentMedia, activeMedia!]
+            const newMedia = formatMedia([...currentMedia, activeMedia!])
             setCurrentMedia(newMedia)
 
-            console.log(formatMedia(newMedia).indexOf(activeMedia!));
-            ref.current?.scrollToIndex(formatMedia(newMedia).indexOf(activeMedia!))
-
+            ref.current?.scrollToIndex(newMedia.indexOf(activeMedia!))
 
           }}
         >
@@ -204,7 +198,7 @@ export default function Home() {
                 <SortableContext
                   key={completionLevel}
                   id={completionLevel}
-                  items={media[completionLevel].media.sort((a, b) => a.title.localeCompare(b.title)).map((item) => item.title)}
+                items={media[completionLevel].media.map((item) => item.title)}
                   strategy={verticalListSortingStrategy}
                   disabled={filter != null}
 
@@ -220,7 +214,8 @@ export default function Home() {
                     }}
                     completionLevel={completionLevel} key={completionLevel} hoverColor={media[completionLevel].hoverColor
                     }>
-                  {formatMedia(media[completionLevel].media).map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
+                      
+                  {media[completionLevel].media.map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
            
                   </CompletionLevelColumn>
                 </SortableContext>

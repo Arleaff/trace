@@ -1,10 +1,5 @@
 "use client";
-import { useDraggable } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { RefObject, useEffect, useRef, useState } from 'react';
-
-
 
 
 function ProgressCircle({rating} : {rating: number | null}) {
@@ -37,16 +32,21 @@ export default function MediaCard( { title, rating, completionLevel }: { title: 
         opacity: isDragging ? "0.5" : "1",
     };
 
-
-
     return ( 
         <div
             ref={setNodeRef}
             style={style}
-            {...listeners} {...attributes} aria-describedby=''
-            className="flex flex-row flex-1 items-center border-2 rounded-xl px-3 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1">
+            {...listeners} 
+            {...attributes}
+             aria-describedby=''
+            className="flex flex-row flex-1 items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
+        >
+
             <ProgressCircle rating={rating}></ProgressCircle>
-            <span className="ml-4 line-clamp-2">{title}</span>
+
+            <span className="ml-4 line-clamp-2 flex-1">{title}</span>
+
+
         </div>
         
         
