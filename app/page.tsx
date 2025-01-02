@@ -5,10 +5,9 @@ import MediaCard, { StaticMediaCard } from "@/components/media-card";
 import SideBar from "@/components/sidebar";
 import { MEDIA_LISTS } from "@/data";
 import { closestCenter, DndContext, DragOverlay, KeyboardSensor, MeasuringStrategy, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 
 import { RefObject, useEffect, useRef, useState } from "react";
-import { VList, VListHandle } from "virtua";
+import { VListHandle } from "virtua";
 
 export default function Home() {
 
@@ -126,12 +125,6 @@ export default function Home() {
 
   }, [])
 
-  const [currentIndex, setCurrentIndex] = useState(-1)
-
-  
-
-
-
   return (
     // w-dvw is needed for something..?
     <div className="flex flex-row h-dvh ">
@@ -140,8 +133,7 @@ export default function Home() {
 
         <DndContext
           sensors={sensors}
-          // measuring={measuringConfig}
-          collisionDetection={closestCenter}
+          // collisionDetection={closestCenter}
           onDragStart={
             (event) => {
 
@@ -151,7 +143,7 @@ export default function Home() {
             }
           }
           onDragEnd={
-            (event) => {
+            () => {
               setActiveMedia(null)
             }
           }
@@ -162,10 +154,10 @@ export default function Home() {
             const title = event.active.id
 
             const overContainer = event.over?.id
-            const overItems = event.over?.data.current?.completionLevel
+
             
 
-            let newCompletionLevel = COMPLETION_LEVELS.find(value => value == overContainer || value == overItems)     
+            let newCompletionLevel = COMPLETION_LEVELS.find(value => value == overContainer)     
   
 
             if (completionLevel == newCompletionLevel || !newCompletionLevel) {
@@ -192,17 +184,6 @@ export default function Home() {
             COMPLETION_LEVELS.map(completionLevel =>
               ((filter == null || filter == completionLevel) &&
 
-
-
-
-                <SortableContext
-                  key={completionLevel}
-                  id={completionLevel}
-                items={media[completionLevel].media.map((item) => item.title)}
-                  strategy={verticalListSortingStrategy}
-                  disabled={filter != null}
-
-                >
                   <CompletionLevelColumn
                     VListRef={media[completionLevel].ref}
                     hover={activeMedia?.completionLevel == completionLevel}
@@ -218,7 +199,6 @@ export default function Home() {
                   {media[completionLevel].media.map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
            
                   </CompletionLevelColumn>
-                </SortableContext>
 
               
             )

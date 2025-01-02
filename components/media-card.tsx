@@ -1,5 +1,5 @@
 "use client";
-import { useSortable } from '@dnd-kit/sortable';
+import { useDraggable } from '@dnd-kit/core';
 
 
 function ProgressCircle({rating} : {rating: number | null}) {
@@ -22,13 +22,12 @@ function ProgressCircle({rating} : {rating: number | null}) {
 
 export default function MediaCard( { title, rating, completionLevel }: { title: string, rating: number | null, completionLevel: string}) {
 
-    const { attributes, listeners, setNodeRef, transition, isDragging } = useSortable({
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: title,
         data: { rating: rating, completionLevel },
     });    
 
     const style: React.CSSProperties = {
-        transition,
         opacity: isDragging ? "0.5" : "1",
     };
 
