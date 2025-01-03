@@ -1,6 +1,7 @@
 "use client";
 import { useDraggable } from '@dnd-kit/core';
 import * as Dialog from "@radix-ui/react-dialog";
+import { Cross2Icon } from '@radix-ui/react-icons';
 
 
 function ProgressCircle({rating} : {rating: number | null}) {
@@ -37,7 +38,8 @@ export default function MediaCard( { title, rating, completionLevel }: { title: 
 
             <Dialog.Root>
                 <Dialog.Trigger
-                    className="w-full"
+                
+                    asChild
                 >
                     <div
                         ref={setNodeRef}
@@ -103,6 +105,7 @@ export default function MediaCard( { title, rating, completionLevel }: { title: 
                                 className="absolute right-2.5 top-2.5 inline-flex size-[25px] appearance-none items-center justify-center rounded-full text-violet11 hover:bg-violet4 focus:shadow-[0_0_0_2px] focus:shadow-violet7 focus:outline-none"
                                 aria-label="Close"
                             >
+                                <Cross2Icon />
                             </button>
                         </Dialog.Close>
                     </Dialog.Content>

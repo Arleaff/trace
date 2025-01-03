@@ -4,7 +4,10 @@ import CompletionLevelColumn from "@/components/column";
 import MediaCard, { StaticMediaCard } from "@/components/media-card";
 import SideBar from "@/components/sidebar";
 import { MEDIA_LISTS } from "@/data";
-import { closestCenter, DndContext, DragOverlay, KeyboardSensor, MeasuringStrategy, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { CaretSortIcon, ChevronDownIcon, ChevronUpIcon, LetterCaseCapitalizeIcon, MagnifyingGlassIcon, PlusCircledIcon } from "@radix-ui/react-icons";
+import * as Toolbar from "@radix-ui/react-toolbar";
+import * as Select from "@radix-ui/react-select";
 
 import { RefObject, useEffect, useRef, useState } from "react";
 import { VListHandle } from "virtua";
@@ -128,97 +131,157 @@ export default function Home() {
   }, [])
 
   return (
-    // w-dvw is needed for something..?
-    <div className="flex flex-row h-dvh ">
+    // find alternative to overflow hidden
+    <div className="flex flex-row h-dvh min-w-0 overflow-hidden">
       <SideBar></SideBar>
-      <div className="flex flex-1 flex-row h-dvh p-4 overflow-y-hidden">
+      
+      <div className="min-w-fit h-full flex flex-col flex-1">
+        
+        <Toolbar.Root id="toolbar" className="flex flex-none gap-2 justify-center py-2" >
+          <div id="search" className="flex items-center border rounded-md px-2">
+            <MagnifyingGlassIcon/>
+            <input type="text" id="search" className="mx-2 outline-none" autoComplete="off" />
+          </div>
+          
+          <Select.Root
+            defaultValue="alphabetical"
+            onValueChange={ (value) => {
+              console.log(value);
+              
+            }}
+          >
+            <Select.Trigger
+              id="select"
+              className="inline-flex flex-none items-center justify-center gap-[5px] rounded bg-white px-[15px] text-sm leading-none text-violet11 shadow-[0_2px_10px] shadow-black/10 outline-none hover:bg-mauve3 focus:shadow-[0_0_0_2px] focus:shadow-black data-[placeholder]:text-violet9"
+              aria-label="Food"
+            >
+              <Select.Icon>
+                <CaretSortIcon />
+              </Select.Icon>
+              <Select.Value placeholder="Sort"/>
 
-        <DndContext
-          sensors={sensors}
-          // collisionDetection={closestCenter}
-          onDragStart={
-            (event) => {
+            </Select.Trigger>
+            <Select.Portal>
+              <Select.Content 
+                position="popper"
+                className="overflow-hidden rounded-md bg-white shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)]"
+                style={{width: "var(--radix-select-trigger-width)", maxHeight: "var(--radix-select-content-available-height)"}}
+              >
+                <Select.Viewport className="p-[5px]">
+                  <Select.Item value="alphabetical" className="data-[state=checked]:hidden line-clamp-1 px-2 text-sm">
+                    <Select.ItemText>
+                      Alphabetical
+                    </Select.ItemText>
+                  </Select.Item>
 
-              const { rating, completionLevel } = (event.active.data.current as { rating: number | null, completionLevel: CompletionLevels })
+                  <Select.Item value="highest_rating" className="data-[state=checked]:hidden data-[state=checked]: line-clamp-1 px-2 text-sm">
+                    <Select.ItemText>
+                      Highest Rating ffffffffffffffff
+                    </Select.ItemText>
+                  </Select.Item>
+
+                </Select.Viewport>
+
+              </Select.Content>
+            </Select.Portal>
+          </Select.Root>
+
+          <Toolbar.Separator className="w-px" />
+
+          <Toolbar.Button className="inline-flex items-center gap-1">
+            New Item
+          </Toolbar.Button>
+
+        </Toolbar.Root>
+
+        <div className="flex flex-row flex-1 p-2 overflow-x-hidden">
+
+          <DndContext
+            sensors={sensors}
+            // collisionDetection={closestCenter}
+            onDragStart={
+              (event) => {
+
+                const { rating, completionLevel } = (event.active.data.current as { rating: number | null, completionLevel: CompletionLevels })
+                const title = event.active.id
+                setActiveMedia({ title: title as string, rating, completionLevel })
+              }
+            }
+            onDragEnd={
+              () => {
+                setActiveMedia(null)
+              }
+            }
+            onDragOver={(event) => {
+              const { completionLevel, rating } = activeMedia!
+
+
               const title = event.active.id
-              setActiveMedia({ title: title as string, rating, completionLevel })
-            }
-          }
-          onDragEnd={
-            () => {
-              setActiveMedia(null)
-            }
-          }
-          onDragOver={(event) => {            
-            const { completionLevel, rating } = activeMedia!
-            
 
-            const title = event.active.id
-
-            const overContainer = event.over?.id
-
-            
-
-            let newCompletionLevel = COMPLETION_LEVELS.find(value => value == overContainer)     
-  
-
-            if (completionLevel == newCompletionLevel || !newCompletionLevel) {
-              return
-            }
-            const { media: oldMedia, setMedia: setOldMedia } = media[completionLevel]
-            const { media: currentMedia, setMedia: setCurrentMedia, ref } = media[newCompletionLevel]
-
-            setActiveMedia({ title: title as string, rating, completionLevel: newCompletionLevel })
-
-            setOldMedia(oldMedia.filter(media => media.title != title))
-
-            const newMedia = formatMedia([...currentMedia, activeMedia!])
-            setCurrentMedia(newMedia)
-
-            ref.current?.scrollToIndex(newMedia.indexOf(activeMedia!))
-
-          }}
-        >
+              const overContainer = event.over?.id
 
 
-          {
 
-            COMPLETION_LEVELS.map(completionLevel =>
+              let newCompletionLevel = COMPLETION_LEVELS.find(value => value == overContainer)
+
+
+              if (completionLevel == newCompletionLevel || !newCompletionLevel) {
+                return
+              }
+              const { media: oldMedia, setMedia: setOldMedia } = media[completionLevel]
+              const { media: currentMedia, setMedia: setCurrentMedia, ref } = media[newCompletionLevel]
+
+              setActiveMedia({ title: title as string, rating, completionLevel: newCompletionLevel })
+
+              setOldMedia(oldMedia.filter(media => media.title != title))
+
+              const newMedia = formatMedia([...currentMedia, activeMedia!])
+              setCurrentMedia(newMedia)
+
+              ref.current?.scrollToIndex(newMedia.indexOf(activeMedia!))
+
+            }}
+          >
+
+
+            {
+
+              COMPLETION_LEVELS.map(completionLevel =>
               ((filter == null || filter == completionLevel) &&
 
-                  <CompletionLevelColumn
-                    VListRef={media[completionLevel].ref}
-                    hover={activeMedia?.completionLevel == completionLevel}
-                    onFilter={() => {
-                      const newFilter: CompletionLevels | null = filter ? null : completionLevel as CompletionLevels
+                <CompletionLevelColumn
+                  VListRef={media[completionLevel].ref}
+                  hover={activeMedia?.completionLevel == completionLevel}
+                  onFilter={() => {
+                    const newFilter: CompletionLevels | null = filter ? null : completionLevel as CompletionLevels
 
-                      setFilter(newFilter as CompletionLevels)
-                      return newFilter
-                    }}
-                    completionLevel={completionLevel} key={completionLevel} hoverColor={media[completionLevel].hoverColor
-                    }>
-                      
+                    setFilter(newFilter as CompletionLevels)
+                    return newFilter
+                  }}
+                  completionLevel={completionLevel} key={completionLevel} hoverColor={media[completionLevel].hoverColor
+                  }>
+
                   {media[completionLevel].media.map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
-           
-                  </CompletionLevelColumn>
 
-              
-            )
+                </CompletionLevelColumn>
 
+              )
 
+              )
+            }
 
-            )
-          }
-          <DragOverlay>
-            {activeMedia && <StaticMediaCard title={activeMedia.title} rating={activeMedia.rating} ></StaticMediaCard>}
-          </DragOverlay>
+            <DragOverlay>
+              {activeMedia && <StaticMediaCard title={activeMedia.title} rating={activeMedia.rating} ></StaticMediaCard>}
+            </DragOverlay>
 
-        </DndContext>
-
-        
+          </DndContext>
 
 
+
+
+        </div>
       </div>
+
     </div>
   );
 }
