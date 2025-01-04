@@ -1,7 +1,7 @@
 "use client";
 import { useDraggable } from '@dnd-kit/core';
 import MediaDialog from './media-dialog';
-import { media } from '@/app/page';
+import { Media } from '@/app/page';
 
 
 
@@ -22,11 +22,15 @@ function ProgressCircle({ rating }: { rating: number | null }) {
     )
 }
 
-export default function MediaCard({ title, rating, completionLevel }: { title: string, rating: number | null, completionLevel: string }) {
+export default function MediaCard({ media, onEdit, onDelete }: 
+    { 
+        media: Media,
+        onEdit: (arg0: Media) => any, onDelete: () => any
+    }) {
 
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-        id: title,
-        data: { rating: rating, completionLevel },
+        id: media.title,
+        data: { rating: media?.rating, completionLevel: media.completionLevel },
     });
 
     const style: React.CSSProperties = {
@@ -37,14 +41,11 @@ export default function MediaCard({ title, rating, completionLevel }: { title: s
         <>
             <MediaDialog 
                 dialogTitle="Edit item"
-                description="Make changes to your item here. Click confirm when you're done."
                 altText='Delete' 
-                
-                onConfirm={function (arg0: media) {
-                    throw new Error('Function not implemented.');
-                } } onAlt={function (arg0: media) {
-                    throw new Error('Function not implemented.');
-                } }            >
+                media={media}
+                onConfirm={onEdit} 
+                onAlt={onDelete}>
+
                 <div
                     ref={setNodeRef}
                     style={style}
@@ -54,9 +55,9 @@ export default function MediaCard({ title, rating, completionLevel }: { title: s
                     className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
                 >
 
-                    <ProgressCircle rating={rating}></ProgressCircle>
+                    <ProgressCircle rating={media.rating}></ProgressCircle>
 
-                    <span className="ml-4 line-clamp-2 text-start">{title}</span>
+                    <span className="ml-4 line-clamp-2 text-start">{media.title}</span>
 
 
                 </div>

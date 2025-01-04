@@ -23,7 +23,7 @@ export default function Home() {
 
   const formatMedia = function formatMedia(completionLevel: string) {
 
-    let formattedMedia: media[] = mediaList.filter(media => media.completionLevel == completionLevel)
+    let formattedMedia: Media[] = mediaList.filter(media => media.completionLevel == completionLevel)
     
     if (search.trim().length != 0) {
       formattedMedia = formattedMedia.filter( media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase())) 
@@ -72,7 +72,7 @@ export default function Home() {
 
 
 
-  const [activeMedia, setActiveMedia] = useState<media | null>(null);  
+  const [activeMedia, setActiveMedia] = useState<Media | null>(null);  
 
   function customCoordinatesGetter(event: { code: any; }, args: any) {
 
@@ -267,7 +267,18 @@ export default function Home() {
                   completionLevel={completionLevel} key={completionLevel} hoverColor={CategoryInfo[completionLevel].hoverColor
                   }>
 
-                  {formatMedia(completionLevel).map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
+                  {formatMedia(completionLevel).map((media) => 
+                    <MediaCard 
+                      media={media}
+                      key={media.title}
+                      onEdit={(updatedMedia) => {
+                        setMediaList((oldList) => oldList.map((oldMedia) => oldMedia.title == updatedMedia.title ? updatedMedia : oldMedia));
+                      } } 
+                      
+                      onDelete={ () => {
+                        setMediaList((oldList) => oldList.filter((oldMedia) => oldMedia.title != media.title))
+                      } }                      />)
+                  }
 
                 </CompletionLevelColumn>
 
@@ -302,7 +313,7 @@ export type MediaSort =
   | 'highest_rating'
   | 'lowest_rating'
 
-export type media = {
+export type Media = {
   title: string;
   rating: null | number;
   completionLevel: CompletionLevels;

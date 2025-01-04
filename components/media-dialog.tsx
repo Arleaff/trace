@@ -1,14 +1,23 @@
-import { media } from "@/app/page";
+import { COMPLETION_LEVELS, CompletionLevels, Media } from "@/app/page";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Cross2Icon } from '@radix-ui/react-icons';
-import { useState } from "react";
+import * as Select from "@radix-ui/react-select";
+import { Label } from "@radix-ui/react-label";
 
-export default function MediaDialog({ children, dialogTitle, description = undefined, confirmText = "Confirm", altText = "Cancel", mediaTitle = "", onConfirm, onAlt = () =>{} } 
-    : { children?: React.ReactNode, dialogTitle: string, description?: string, confirmText?: string, altText?: string, mediaTitle?: string, 
-        onConfirm: (arg0: media) => any , onAlt: (arg0: media) => any }
-    ) {
+import { Cross2Icon } from '@radix-ui/react-icons';
+import { useRef, useState } from "react";
+
+export default function MediaDialog(
+    { children, dialogTitle, description = undefined, confirmText = "Confirm", altText = "Cancel", onConfirm, onAlt = () =>{}, media = undefined } 
+    : { children?: React.ReactNode, dialogTitle: string, description?: string, confirmText?: string, altText?: string, 
+            onConfirm: (arg0: Media) => any, onAlt: () => any, 
+            media?: Media
+    },) {
 
     const [ open, setOpen ] = useState(false)
+
+    const [category, setCategory] = useState(media?.completionLevel)
+
+    const formRef = useRef<HTMLFormElement>(null)
 
     return (
         <>
@@ -24,28 +33,86 @@ export default function MediaDialog({ children, dialogTitle, description = undef
                         { description && <Dialog.Description className="mb-5 mt-2.5 text-[15px] leading-normal">
                             {description}
                         </Dialog.Description>}
-                        <form onSubmit={e => {
-                            console.log(e);
-                            setOpen(false)
-                            e.preventDefault()
-                        }}>
+                        <form
+                            ref={formRef}
+                            onKeyDown={ (event) => {
+                                    if (event.key === "Enter") {
+                                        event.preventDefault()
+                                        formRef.current?.requestSubmit()
+                                    }
+                                }
+                            }
+                            action={async formData => {                                
+                                const title = formData.get("title");
+                                const rating = formData.get("rating");
+                                await onConfirm( { title, rating, completionLevel: category } as Media)
+                                setOpen(false)
+                            }}
+                        >
                             <label className="w-[90px] text-right text-[15px]" htmlFor="title">Title</label>
                             <input 
                                 className="inline-flex h-[35px] w-full flex-1 items-center justify-center rounded px-2.5 text-[15px] leading-none text-violet11 shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]" 
                                 id="title"
-                                defaultValue={mediaTitle}
+                                name="title"
+                                defaultValue={media?.title}
                             />
 
                             <label className="w-[90px] text-right text-[15px] text-violet11" htmlFor="rating">Rating</label>
                             <input 
                                 className="inline-flex h-[35px] w-full flex-1 items-center justify-center rounded px-2.5 text-[15px] leading-none text-violet11 shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]" 
                                 id="rating" 
+                                name="rating"
+                                defaultValue={media?.rating ? media.rating : undefined}
                                 placeholder="N/A"
                             />
 
+                            <Label>
+                                Category
+                                <Select.Root
+                                    onValueChange={(value) => {
+                                        setCategory(value as CompletionLevels)
+                                    }}
+                                    defaultValue={media?.completionLevel as string}
+                                >
+                                    <Select.Trigger
+                                        id="select"
+                                        className="m-4 w-48 h-6 inline-flex flex-none items-center justify-center gap-[5px] rounded bg-white px-[15px] text-sm leading-none  shadow-black/10 outline-none focus:shadow-[0_0_0_2px]"
+                                        aria-label="Food"
+                                        name="category"
+                                    >
+                                        <Select.Value placeholder="Choose a category" className="line-clamp-1 text-nowrap"/>
+
+                                    </Select.Trigger>
+                                    <Select.Portal>
+                                        <Select.Content
+                                            position="popper"
+                                            className="overflow-hidden rounded-md bg-white "
+                                            style={{ width: "var(--radix-select-trigger-width)", maxHeight: "var(--radix-select-content-available-height)" }}
+                                        >
+
+                                            <Select.Viewport className="p-[5px]">
+
+                                                {
+                                                    COMPLETION_LEVELS.map((level) =>
+                                                        <Select.Item key={level} value={ level } className="data-[state=checked]:hidden line-clamp-1 px-2 text-sm text-center">
+                                                            <Select.ItemText>
+                                                                {level}
+                                                            </Select.ItemText>
+                                                        </Select.Item>
+                                                    )
+                                                }
+
+                                            </Select.Viewport>
+
+                                        </Select.Content>
+                                    </Select.Portal>
+                                </Select.Root>
+                            </Label>
+
                             <div id="buttons" className="mt-[25px] flex justify-between">
                                 <Dialog.Close asChild>
-                                    <button type='submit' className="inline-flex h-[35px] items-center justify-center rounded bg-green4 px-[15px] font-medium leading-none text-green11 hover:bg-green5 focus:shadow-[0_0_0_2px] focus:shadow-green7 focus:outline-none">
+                                    <button onClick={onAlt}
+                                     type='submit' className="inline-flex h-[35px] items-center justify-center rounded bg-green4 px-[15px] font-medium leading-none text-green11 hover:bg-green5 focus:shadow-[0_0_0_2px] focus:shadow-green7 focus:outline-none">
                                         {altText}
                                     </button>
                                 </Dialog.Close>
@@ -54,8 +121,10 @@ export default function MediaDialog({ children, dialogTitle, description = undef
                                     {confirmText}
                                 </button>
                             </div>
-
+                            
                         </form>
+
+                        
                         <Dialog.Close asChild>
                             <button
                                 className="absolute right-2.5 top-2.5 inline-flex size-[25px] appearance-none items-center justify-center rounded-full text-violet11 hover:bg-violet4 focus:shadow-[0_0_0_2px focus:outline-none"

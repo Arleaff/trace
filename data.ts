@@ -1,8 +1,8 @@
-import { CompletionLevels, media } from "./app/page";
+import { CompletionLevels, Media } from "./app/page";
 
 export const MEDIA_LISTS: {
     listName: string;
-    media: media[];
+    media: Media[];
 }[] = [ 
     {   listName: "Anime",
         // media: [...Array(1000).keys()].map( i => { return { title: i.toString(), rating: null, completionLevel: "Ongoing" }} )
