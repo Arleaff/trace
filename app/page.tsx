@@ -16,46 +16,55 @@ export default function Home() {
 
   const [filter, setFilter] = useState<CompletionLevels | null>(null)
 
-  const currentList = MEDIA_LISTS[0].media
+  const [mediaList, setMediaList ] = useState(MEDIA_LISTS[0].media)
 
-  function formatMedia(media: media[]) {
-    // for filter, search, and sort later on
-    // .filter( media => media.title.includes("0"))
-    return media.sort((a, b) => a.title.localeCompare(b.title))
+  const [search, setSearch ] = useState<string>("")
+  const [sort, setSort] = useState<MediaSort>('alphabetical')
+
+  const formatMedia = function formatMedia(completionLevel: string) {
+
+    let formattedMedia: media[] = mediaList.filter(media => media.completionLevel == completionLevel)
+    
+    if (search.trim().length != 0) {
+      formattedMedia = formattedMedia.filter( media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase())) 
+    }
+
+    switch (sort) {
+
+      case 'alphabetical':
+        return formattedMedia.sort((a, b) => a.title.localeCompare(b.title))
+      default:
+      case "highest_rating":
+        return formattedMedia.sort((a, b) => {
+          // nulls sort after anything else
+          if (a.rating === null) {
+            return 1;
+          }
+          if (b.rating === null) {
+            return -1;
+          }
+
+          return b.rating - a.rating
+        })
+    }
+
   }
 
-  
-  const [unstarted, setUnstarted] = useState(formatMedia(currentList.filter(media => media.completionLevel == "Unstarted")))
-
-  const [ongoing, setOngoing] = useState(formatMedia(currentList.filter(media => media.completionLevel == "Ongoing")))
-
-  const [finished, setFinished] = useState(formatMedia(currentList.filter(media => media.completionLevel == "Finished")))
-
-  const [dropped, setDropped] = useState(formatMedia(currentList.filter(media => media.completionLevel == "Dropped")))
-
-  const media: MediaMap = {
+  const CategoryInfo: MediaMap = {
     "Unstarted": {
       hoverColor: "rgb(128 128 128 / .1)",
-      media: unstarted,
-      setMedia: setUnstarted,
       ref: useRef<VListHandle>(null)
     },
     "Ongoing": {
       hoverColor: "rgb(82 204 207 / .2)",
-      media: ongoing,
-      setMedia: setOngoing,
       ref: useRef<VListHandle>(null)
     },
     "Finished": {
       hoverColor: "rgb( 64 201 103 / .15)",
-      media: finished,
-      setMedia: setFinished,
       ref: useRef<VListHandle>(null)
     },
     "Dropped": {
       hoverColor: "rgb(243 16 141 / .1)",
-      media: dropped,
-      setMedia: setDropped,
       ref: useRef<VListHandle>(null)
     },
   }
@@ -137,46 +146,50 @@ export default function Home() {
       
       <div className="min-w-fit h-full flex flex-col flex-1">
         
-        <Toolbar.Root id="toolbar" className="flex flex-none gap-2 justify-center py-2" >
+        <Toolbar.Root id="toolbar" className="flex flex-none gap-2 justify-center py-4" >
           <div id="search" className="flex items-center border rounded-md px-2">
             <MagnifyingGlassIcon/>
-            <input type="text" id="search" className="mx-2 outline-none" autoComplete="off" />
+            <input 
+              type="text" id="search" className="mx-2 outline-none" autoComplete="off" 
+              onInput={ (e) => {
+                setSearch((e.target as HTMLInputElement).value)
+              }}
+            />
           </div>
           
           <Select.Root
             defaultValue="alphabetical"
             onValueChange={ (value) => {
-              console.log(value);
-              
+              setSort(value as MediaSort)
             }}
           >
             <Select.Trigger
               id="select"
-              className="inline-flex flex-none items-center justify-center gap-[5px] rounded bg-white px-[15px] text-sm leading-none text-violet11 shadow-[0_2px_10px] shadow-black/10 outline-none hover:bg-mauve3 focus:shadow-[0_0_0_2px] focus:shadow-black data-[placeholder]:text-violet9"
+              className="w-48 h-6 inline-flex flex-none items-center justify-center gap-[5px] rounded bg-white px-[15px] text-sm leading-none  shadow-black/10 outline-none focus:shadow-[0_0_0_2px]"
               aria-label="Food"
             >
               <Select.Icon>
                 <CaretSortIcon />
               </Select.Icon>
-              <Select.Value placeholder="Sort"/>
+              <Select.Value placeholder="Sort" className="line-clamp-1 text-nowrap"/>
 
             </Select.Trigger>
             <Select.Portal>
               <Select.Content 
                 position="popper"
-                className="overflow-hidden rounded-md bg-white shadow-[0px_10px_38px_-10px_rgba(22,_23,_24,_0.35),0px_10px_20px_-15px_rgba(22,_23,_24,_0.2)]"
+                className="overflow-hidden rounded-md bg-white "
                 style={{width: "var(--radix-select-trigger-width)", maxHeight: "var(--radix-select-content-available-height)"}}
               >
                 <Select.Viewport className="p-[5px]">
-                  <Select.Item value="alphabetical" className="data-[state=checked]:hidden line-clamp-1 px-2 text-sm">
+                  <Select.Item value="alphabetical" className="data-[state=checked]:hidden line-clamp-1 px-2 text-sm text-center">
                     <Select.ItemText>
                       Alphabetical
                     </Select.ItemText>
                   </Select.Item>
 
-                  <Select.Item value="highest_rating" className="data-[state=checked]:hidden data-[state=checked]: line-clamp-1 px-2 text-sm">
+                  <Select.Item value="highest_rating" className="data-[state=checked]:hidden data-[state=checked]: line-clamp-1 px-2 text-sm text-center">
                     <Select.ItemText>
-                      Highest Rating ffffffffffffffff
+                      Highest Rating
                     </Select.ItemText>
                   </Select.Item>
 
@@ -194,7 +207,7 @@ export default function Home() {
 
         </Toolbar.Root>
 
-        <div className="flex flex-row flex-1 p-2 overflow-x-hidden">
+        <div className="flex flex-row flex-1 p-2 pb-2 overflow-x-hidden">
 
           <DndContext
             sensors={sensors}
@@ -220,25 +233,18 @@ export default function Home() {
 
               const overContainer = event.over?.id
 
-
-
               let newCompletionLevel = COMPLETION_LEVELS.find(value => value == overContainer)
 
 
               if (completionLevel == newCompletionLevel || !newCompletionLevel) {
                 return
               }
-              const { media: oldMedia, setMedia: setOldMedia } = media[completionLevel]
-              const { media: currentMedia, setMedia: setCurrentMedia, ref } = media[newCompletionLevel]
+              
+              setMediaList( (prevState) => (prevState.map( (media) => media.title == activeMedia?.title ? {...activeMedia, completionLevel: newCompletionLevel} : media )))
 
               setActiveMedia({ title: title as string, rating, completionLevel: newCompletionLevel })
 
-              setOldMedia(oldMedia.filter(media => media.title != title))
-
-              const newMedia = formatMedia([...currentMedia, activeMedia!])
-              setCurrentMedia(newMedia)
-
-              ref.current?.scrollToIndex(newMedia.indexOf(activeMedia!))
+              CategoryInfo[newCompletionLevel].ref.current?.scrollToIndex(formatMedia(newCompletionLevel).indexOf(activeMedia!))
 
             }}
           >
@@ -250,7 +256,7 @@ export default function Home() {
               ((filter == null || filter == completionLevel) &&
 
                 <CompletionLevelColumn
-                  VListRef={media[completionLevel].ref}
+                  VListRef={CategoryInfo[completionLevel].ref}
                   hover={activeMedia?.completionLevel == completionLevel}
                   onFilter={() => {
                     const newFilter: CompletionLevels | null = filter ? null : completionLevel as CompletionLevels
@@ -258,10 +264,10 @@ export default function Home() {
                     setFilter(newFilter as CompletionLevels)
                     return newFilter
                   }}
-                  completionLevel={completionLevel} key={completionLevel} hoverColor={media[completionLevel].hoverColor
+                  completionLevel={completionLevel} key={completionLevel} hoverColor={CategoryInfo[completionLevel].hoverColor
                   }>
 
-                  {media[completionLevel].media.map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
+                  {formatMedia(completionLevel).map((media) => <MediaCard completionLevel={completionLevel} title={media.title} rating={media.rating} key={media.title} ></MediaCard>)}
 
                 </CompletionLevelColumn>
 
@@ -291,11 +297,10 @@ export default function Home() {
 export const COMPLETION_LEVELS = ['Unstarted', 'Ongoing', 'Finished', 'Dropped'] as const;
 export type CompletionLevels = typeof COMPLETION_LEVELS[number];
 
-// export type CompletionLevels =
-//   | 'Unstarted'
-//   | 'Ongoing'
-//   | 'Finished'
-//   | 'Dropped'
+export type MediaSort =
+  | 'alphabetical'
+  | 'highest_rating'
+  | 'lowest_rating'
 
 export type media = {
   title: string;
@@ -306,8 +311,6 @@ export type media = {
 interface MediaMap {
   [key: string]: {
     hoverColor: string,
-    media: media[],
-    setMedia: any,
     ref: RefObject<VListHandle | null>
   }
 }

@@ -58,7 +58,8 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
                 // TODO: see if height changes performance
                     <VList
                         ref={VListRef}
-                        className='no-scrollbar h-full overflow-y-scroll'>
+                        className='no-scrollbar h-full overflow-y-scroll flex'
+                        >
                         {children}
                     </VList>
 

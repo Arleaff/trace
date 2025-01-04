@@ -1,10 +1,11 @@
 "use client";
 import { useDraggable } from '@dnd-kit/core';
-import * as Dialog from "@radix-ui/react-dialog";
-import { Cross2Icon } from '@radix-ui/react-icons';
+import MediaDialog from './media-dialog';
+import { media } from '@/app/page';
 
 
-function ProgressCircle({rating} : {rating: number | null}) {
+
+function ProgressCircle({ rating }: { rating: number | null }) {
     const size = 60
     const radius = 25
     const dashArray = radius * 2 * Math.PI
@@ -13,21 +14,20 @@ function ProgressCircle({rating} : {rating: number | null}) {
     return (
         <svg width={size} height={size} className="flex flex-none">
             <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
-                <circle r={radius} cx={size/2} cy={size/2} fill="transparent" stroke="lightgrey" strokeWidth={`${strokeWidth}px`} strokeDasharray={dashArray} strokeDashoffset="0"></circle>
-                <circle className="progress" stroke="#75DDDD" strokeDashoffset={ rating ? dashArray * (1 - rating / 10) : dashArray} r={radius} cx={size / 2} cy={size / 2} fill="transparent" strokeLinecap="round" strokeWidth={`${strokeWidth}`} strokeDasharray={dashArray}/>
+                <circle r={radius} cx={size / 2} cy={size / 2} fill="transparent" stroke="lightgrey" strokeWidth={`${strokeWidth}px`} strokeDasharray={dashArray} strokeDashoffset="0"></circle>
+                <circle className="progress" stroke="#75DDDD" strokeDashoffset={rating ? dashArray * (1 - rating / 10) : dashArray} r={radius} cx={size / 2} cy={size / 2} fill="transparent" strokeLinecap="round" strokeWidth={`${strokeWidth}`} strokeDasharray={dashArray} />
             </g>
             <text x="50%" y="50%" dominantBaseline="central" textAnchor="middle" className={` font-sans ${rating ? "text-lg" : "text-base"} font-medium content-center`}>{rating || "N/A"}</text>
         </svg>
     )
 }
 
-
-export default function MediaCard( { title, rating, completionLevel }: { title: string, rating: number | null, completionLevel: string}) {
+export default function MediaCard({ title, rating, completionLevel }: { title: string, rating: number | null, completionLevel: string }) {
 
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: title,
         data: { rating: rating, completionLevel },
-    });    
+    });
 
     const style: React.CSSProperties = {
         opacity: isDragging ? "0.5" : "1",
@@ -35,86 +35,36 @@ export default function MediaCard( { title, rating, completionLevel }: { title: 
 
     return (
         <>
-
-            <Dialog.Root>
-                <Dialog.Trigger
+            <MediaDialog 
+                dialogTitle="Edit item"
+                description="Make changes to your item here. Click confirm when you're done."
+                altText='Delete' 
                 
-                    asChild
+                onConfirm={function (arg0: media) {
+                    throw new Error('Function not implemented.');
+                } } onAlt={function (arg0: media) {
+                    throw new Error('Function not implemented.');
+                } }            >
+                <div
+                    ref={setNodeRef}
+                    style={style}
+                    {...listeners}
+                    {...attributes}
+                    aria-describedby=''
+                    className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
                 >
-                    <div
-                        ref={setNodeRef}
-                        style={style}
-                        {...listeners}
-                        {...attributes}
-                        aria-describedby=''
-                        className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
-                    >
 
-                        <ProgressCircle rating={rating}></ProgressCircle>
+                    <ProgressCircle rating={rating}></ProgressCircle>
 
-                        <span className="ml-4 line-clamp-2 text-start">{title}</span>
+                    <span className="ml-4 line-clamp-2 text-start">{title}</span>
 
 
-                    </div>
-
-                </Dialog.Trigger>
-                <Dialog.Portal>
-                    <Dialog.Overlay className="fixed inset-0 bg-blackA6 data-[state=open]:animate-overlayShow" />
-                    <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none data-[state=open]:animate-contentShow">
-                        <Dialog.Title className="m-0 text-[17px] font-medium text-mauve12">
-                            Edit profile
-                        </Dialog.Title>
-                        <Dialog.Description className="mb-5 mt-2.5 text-[15px] leading-normal text-mauve11">
-                            Make changes to your profile here. Click save when you're done.
-                        </Dialog.Description>
-                        <fieldset className="mb-[15px] flex items-center gap-5">
-                            <label
-                                className="w-[90px] text-right text-[15px] text-violet11"
-                                htmlFor="name"
-                            >
-                                Name
-                            </label>
-                            <input
-                                className="inline-flex h-[35px] w-full flex-1 items-center justify-center rounded px-2.5 text-[15px] leading-none text-violet11 shadow-[0_0_0_1px] shadow-violet7 outline-none focus:shadow-[0_0_0_2px] focus:shadow-violet8"
-                                id="name"
-                                defaultValue="Pedro Duarte"
-                            />
-                        </fieldset>
-                        <fieldset className="mb-[15px] flex items-center gap-5">
-                            <label
-                                className="w-[90px] text-right text-[15px] text-violet11"
-                                htmlFor="username"
-                            >
-                                Username
-                            </label>
-                            <input
-                                className="inline-flex h-[35px] w-full flex-1 items-center justify-center rounded px-2.5 text-[15px] leading-none text-violet11 shadow-[0_0_0_1px] shadow-violet7 outline-none focus:shadow-[0_0_0_2px] focus:shadow-violet8"
-                                id="username"
-                                defaultValue="@peduarte"
-                            />
-                        </fieldset>
-                        <div className="mt-[25px] flex justify-end">
-                            <Dialog.Close asChild>
-                                <button className="inline-flex h-[35px] items-center justify-center rounded bg-green4 px-[15px] font-medium leading-none text-green11 hover:bg-green5 focus:shadow-[0_0_0_2px] focus:shadow-green7 focus:outline-none">
-                                    Save changes
-                                </button>
-                            </Dialog.Close>
-                        </div>
-                        <Dialog.Close asChild>
-                            <button
-                                className="absolute right-2.5 top-2.5 inline-flex size-[25px] appearance-none items-center justify-center rounded-full text-violet11 hover:bg-violet4 focus:shadow-[0_0_0_2px] focus:shadow-violet7 focus:outline-none"
-                                aria-label="Close"
-                            >
-                                <Cross2Icon />
-                            </button>
-                        </Dialog.Close>
-                    </Dialog.Content>
-                </Dialog.Portal>
-            </Dialog.Root>
+                </div>
+            </MediaDialog>
         </>
 
-        
-        
+
+
     )
 }
 
@@ -128,7 +78,7 @@ export function StaticMediaCard({ title, rating }: { title: string, rating: numb
         >
             <div aria-describedby=''
                 className="flex flex-row items-center border-2 rounded-xl px-3 py-2 select-none shadow-sm hover:shadow-md bg-white hover:cursor-grabbing">
-                <StaticProgressCircle rating={rating}/>
+                <StaticProgressCircle rating={rating} />
                 <span className=" ml-4 line-clamp-2">{title}</span>
             </div>
         </div>
