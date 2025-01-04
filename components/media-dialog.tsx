@@ -54,6 +54,7 @@ export default function MediaDialog(
                                 className="inline-flex h-[35px] w-full flex-1 items-center justify-center rounded px-2.5 text-[15px] leading-none text-violet11 shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]" 
                                 id="title"
                                 name="title"
+                                autoComplete="off"
                                 defaultValue={media?.title}
                             />
 
@@ -62,6 +63,7 @@ export default function MediaDialog(
                                 className="inline-flex h-[35px] w-full flex-1 items-center justify-center rounded px-2.5 text-[15px] leading-none text-violet11 shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]" 
                                 id="rating" 
                                 name="rating"
+                                autoComplete="off"
                                 defaultValue={media?.rating ? media.rating : undefined}
                                 placeholder="N/A"
                             />

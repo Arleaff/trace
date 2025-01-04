@@ -19,7 +19,7 @@ export default function Home() {
   const [mediaList, setMediaList ] = useState(MEDIA_LISTS[0].media)
 
   const [search, setSearch ] = useState<string>("")
-  const [sort, setSort] = useState<MediaSort>('alphabetical')
+  const [sort, setSort] = useState<MediaSort>("highest_rating")
 
   const formatMedia = function formatMedia(completionLevel: string) {
 
@@ -158,7 +158,7 @@ export default function Home() {
           </div>
           
           <Select.Root
-            defaultValue="alphabetical"
+            value={sort}
             onValueChange={ (value) => {
               setSort(value as MediaSort)
             }}
@@ -272,7 +272,7 @@ export default function Home() {
                       media={media}
                       key={media.title}
                       onEdit={(updatedMedia) => {
-                        setMediaList((oldList) => oldList.map((oldMedia) => oldMedia.title == updatedMedia.title ? updatedMedia : oldMedia));
+                        setMediaList((oldList) => oldList.map((oldMedia) => oldMedia.title == media.title ? updatedMedia : oldMedia));
                       } } 
                       
                       onDelete={ () => {
