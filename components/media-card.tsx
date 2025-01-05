@@ -30,7 +30,6 @@ export default function MediaCard({ media, onEdit, onDelete }:
 
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: media.title,
-        data: { rating: media?.rating, completionLevel: media.completionLevel },
     });
 
     const style: React.CSSProperties = {
@@ -58,7 +57,6 @@ export default function MediaCard({ media, onEdit, onDelete }:
                     <ProgressCircle rating={media.rating}></ProgressCircle>
 
                     <span className="ml-4 line-clamp-2 text-start">{media.title}</span>
-
 
                 </div>
             </MediaDialog>

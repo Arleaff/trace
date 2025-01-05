@@ -26,7 +26,7 @@ export default function Home() {
     let formattedMedia: Media[] = mediaList.filter(media => media.completionLevel == completionLevel)
     
     if (search.trim().length != 0) {
-      formattedMedia = formattedMedia.filter( media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase())) 
+      formattedMedia = formattedMedia.filter(media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase()) || media.extra?.toLocaleLowerCase().includes(search.toLocaleLowerCase())) 
     }
 
     switch (sort) {
@@ -112,9 +112,9 @@ export default function Home() {
     useSensor(PointerSensor, {
       activationConstraint: { distance: 1 }
     }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: customCoordinatesGetter,
-    })
+    // useSensor(KeyboardSensor, {
+    //   coordinateGetter: customCoordinatesGetter,
+    // })
   );
 
   // animate rating circle on load
@@ -158,7 +158,7 @@ export default function Home() {
           </div>
           
           <Select.Root
-            value={sort}
+            value={sort} // can be commented out
             onValueChange={ (value) => {
               setSort(value as MediaSort)
             }}
@@ -214,10 +214,8 @@ export default function Home() {
             // collisionDetection={closestCenter}
             onDragStart={
               (event) => {
-
-                const { rating, completionLevel } = (event.active.data.current as { rating: number | null, completionLevel: CompletionLevels })
                 const title = event.active.id
-                setActiveMedia({ title: title as string, rating, completionLevel })
+                setActiveMedia(mediaList.find(m => m.title == title)!)
               }
             }
             onDragEnd={
@@ -226,10 +224,10 @@ export default function Home() {
               }
             }
             onDragOver={(event) => {
-              const { completionLevel, rating } = activeMedia!
+              const { title, extra, completionLevel, rating } = activeMedia!
 
 
-              const title = event.active.id
+              // const title = event.active.id
 
               const overContainer = event.over?.id
 
@@ -242,7 +240,7 @@ export default function Home() {
               
               setMediaList( (prevState) => (prevState.map( (media) => media.title == activeMedia?.title ? {...activeMedia, completionLevel: newCompletionLevel} : media )))
 
-              setActiveMedia({ title: title as string, rating, completionLevel: newCompletionLevel })
+              setActiveMedia({ title, rating, completionLevel: newCompletionLevel, extra })
 
               CategoryInfo[newCompletionLevel].ref.current?.scrollToIndex(formatMedia(newCompletionLevel).indexOf(activeMedia!))
 
@@ -315,7 +313,8 @@ export type MediaSort =
 
 export type Media = {
   title: string;
-  rating: null | number;
+  extra: string | null;
+  rating: number | null;
   completionLevel: CompletionLevels;
 }
 
