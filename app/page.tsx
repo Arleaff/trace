@@ -11,6 +11,7 @@ import * as Select from "@radix-ui/react-select";
 
 import { RefObject, useEffect, useRef, useState } from "react";
 import { VListHandle } from "virtua";
+import MediaDialog from "@/components/media-dialog";
 
 export default function Home() {
 
@@ -201,9 +202,17 @@ export default function Home() {
 
           <Toolbar.Separator className="w-px" />
 
-          <Toolbar.Button className="inline-flex items-center gap-1">
-            New Item
-          </Toolbar.Button>
+            <MediaDialog 
+                dialogTitle="Create new item"
+                altText='Cancel' 
+                onConfirm={ media => { setMediaList( list => [...list, media] ) }} 
+              >
+
+              <Toolbar.Button className="inline-flex items-center gap-1">
+                New Item
+              </Toolbar.Button>
+            </MediaDialog>
+
 
         </Toolbar.Root>
 

@@ -9,7 +9,7 @@ import { useRef, useState } from "react";
 export default function MediaDialog(
     { children, dialogTitle, description = undefined, confirmText = "Confirm", altText = "Cancel", onConfirm, onAlt = () =>{}, media = undefined } 
     : { children?: React.ReactNode, dialogTitle: string, description?: string, confirmText?: string, altText?: string, 
-            onConfirm: (arg0: Media) => any, onAlt: () => any, 
+            onConfirm: (arg0: Media) => any, onAlt?: () => any, 
             media?: Media
     },) {
 
@@ -44,8 +44,10 @@ export default function MediaDialog(
                             }
                             action={async formData => {                                
                                 const title = formData.get("title");
+                                const extra = formData.get("extra");
                                 const rating = formData.get("rating");
-                                await onConfirm( { title, rating, completionLevel: category } as Media)
+
+                                await onConfirm( { title, rating, completionLevel: category, extra } as Media)
                                 setOpen(false)
                             }}
                         >
@@ -58,15 +60,27 @@ export default function MediaDialog(
                                 defaultValue={media?.title}
                             />
 
+                            <label className="w-[90px] text-right text-[15px] text-violet11" htmlFor="rating">Extra</label>
+                            <input
+                                className="inline-flex h-[35px] w-full flex-1 items-center justify-center rounded px-2.5 text-[15px] leading-none text-violet11 shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+                                id="extra"
+                                name="extra"
+                                autoComplete="off"
+                                defaultValue={media?.extra || undefined}
+                                placeholder="N/A"
+                            />
+
                             <label className="w-[90px] text-right text-[15px] text-violet11" htmlFor="rating">Rating</label>
                             <input 
                                 className="inline-flex h-[35px] w-full flex-1 items-center justify-center rounded px-2.5 text-[15px] leading-none text-violet11 shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]" 
                                 id="rating" 
                                 name="rating"
                                 autoComplete="off"
-                                defaultValue={media?.rating ? media.rating : undefined}
+                                defaultValue={media?.rating || undefined}
                                 placeholder="N/A"
                             />
+
+
 
                             <Label>
                                 Category
