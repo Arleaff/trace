@@ -1,4 +1,4 @@
-import { COMPLETION_LEVELS, CompletionLevels, Media } from "@/app/page";
+import { COMPLETION_LEVELS, CompletionLevels, Media } from "@/app/home";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Select from "@radix-ui/react-select";
 import { Label } from "@radix-ui/react-label";
