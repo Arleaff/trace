@@ -1,6 +1,7 @@
 'use server'
 import { neon } from "@neondatabase/serverless";
 
+export const db = neon(process.env.DATABASE_URL || "");
 
 export async function getUserId(email: string) {
 
