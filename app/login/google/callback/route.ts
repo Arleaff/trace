@@ -40,10 +40,12 @@ export async function GET(request: Request): Promise<Response> {
     const googleUserId = claimsParser.getString("sub");
     const username = claimsParser.getString("name");
 
-    // TODO: Replace this with your own DB query.
-    const [existingUser] = await db`SELECT * FROM "MediaTracker".app_user WHERE google_id = ${googleUserId}`;
-    console.log(existingUser);
-    
+    // TODO: Images
+    // const picture = claimsParser.getString("picture");
+
+
+
+    const [existingUser] = await db`SELECT * FROM "MediaTracker".app_user WHERE google_id = ${googleUserId}`;    
     
 
     if (existingUser !== undefined) {

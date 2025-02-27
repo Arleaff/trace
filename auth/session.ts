@@ -29,13 +29,13 @@ export async function validateSessionToken(token: string): Promise<SessionValida
     FROM "MediaTracker".user_session AS user_session 
     INNER JOIN "MediaTracker".app_user ON app_user.id = user_session.user_id 
     WHERE user_session.id = ${sessionId}`;
-    
 
-    if (row === null) {
+    //TODO something is wrong here
+    if (row === undefined) {
         return { session: null, user: null };
     }
     const session: Session = {
-        id: row.id,
+        id: sessionId,
         userId: row.user_id,
         expiresAt: row.expires_at
     };
@@ -45,7 +45,8 @@ export async function validateSessionToken(token: string): Promise<SessionValida
         googleId: row.google_Id
     };
     if (Date.now() >= session.expiresAt.getTime()) {
-        await db`DELETE FROM user_session WHERE id = ${session.id}`;
+        const [result] = await db`DELETE FROM "MediaTracker".user_session WHERE id = ${session.id}`;
+
         return { session: null, user: null };
     }
     if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 15) {
