@@ -41,9 +41,7 @@ export async function GET(request: Request): Promise<Response> {
     const username = claimsParser.getString("name");
 
     // TODO: Replace this with your own DB query.
-    const [existingUser] = await db`SELECT * FROM "MediaTracker".app_user WHERE google_id = ${googleUserId}`;
-    console.log(existingUser);
-    
+    const [existingUser] = await db`SELECT * FROM "MediaTracker".app_user WHERE google_id = ${googleUserId}`;    
     
 
     if (existingUser !== undefined) {
