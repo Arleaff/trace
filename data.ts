@@ -1,4 +1,4 @@
-import { CompletionLevels, Media } from "./app/page";
+import { Media } from "./app/home";
 
 export const MEDIA_LISTS: {
     listName: string;
