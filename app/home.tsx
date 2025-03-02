@@ -61,7 +61,7 @@ export default function Home() {
       hoverColor: "rgb(128 128 128 / .1)",
       ref: useRef<VListHandle>(null)
     },
-    "Ongoing": {
+    "Watching": {
       hoverColor: "rgb(82 204 207 / .2)",
       ref: useRef<VListHandle>(null)
     },
@@ -299,7 +299,8 @@ export default function Home() {
             }
 
             <DragOverlay>
-              {activeMedia && <StaticMediaCard title={activeMedia.title} rating={activeMedia.rating} ></StaticMediaCard>}
+              {/* {activeMedia && <StaticMediaCard title={activeMedia.title} rating={activeMedia.rating} ></StaticMediaCard>} */}
+              {activeMedia && <MediaCard media={activeMedia} ></MediaCard>}
             </DragOverlay>
 
           </DndContext>
@@ -316,7 +317,7 @@ export default function Home() {
 
 
 
-export const COMPLETION_LEVELS = ['Unstarted', 'Ongoing', 'Finished', 'Dropped'] as const;
+export const COMPLETION_LEVELS = ['Unstarted', 'Watching', 'Finished', 'Dropped'] as const;
 export type CompletionLevels = typeof COMPLETION_LEVELS[number];
 
 export type MediaSort =

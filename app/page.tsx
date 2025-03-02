@@ -3,6 +3,8 @@ import Home from "./home";
 import { list } from "postcss";
 import { createSession, generateSessionToken, getCurrentSession } from "@/auth/session";
 import { redirect } from "next/navigation";
+import { Theme } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
 
 
 //TODO: signout
@@ -17,7 +19,9 @@ export default async function Page() {
 
   return (
     <>
-      <Home></Home>
+    <Theme>
+        <Home></Home>
+    </Theme>
     </>
   );
 
