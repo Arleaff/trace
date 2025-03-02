@@ -1,7 +1,8 @@
 "use client";
 import { useDraggable } from '@dnd-kit/core';
 import MediaDialog from './media-dialog';
-import { Media } from '@/app/page';
+import { Media } from '@/app/home';
+import { Avatar, Flex, Progress } from '@radix-ui/themes';
 
 
 
@@ -22,10 +23,10 @@ function ProgressCircle({ rating }: { rating: number | null }) {
     )
 }
 
-export default function MediaCard({ media, onEdit, onDelete }: 
+export default function MediaCard({ media, onEdit = () => { }, onDelete = () => { } }: 
     { 
         media: Media,
-        onEdit: (arg0: Media) => any, onDelete: () => any
+        onEdit?: (arg0: Media) => any, onDelete?: () => any
     }) {
 
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -53,10 +54,28 @@ export default function MediaCard({ media, onEdit, onDelete }:
                     aria-describedby=''
                     className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
                 >
+                    <Avatar
+                        size="4"
+                        // src="https://cdn.prod.website-files.com/64479cbddbde2b42cebe552a/670e4c1fdec561d0419f4098_670e4be66e34c8126df5c591_670e4888efe72ee66f962fee_670e2e2c4421c5eb50a25db1_670e28900575f08fa68d13de_670e24b04b526202fa50647d_670e1c95221517c9ae85e314_Untitled%25252525252520design%25252525252520(17).jpeg"
+                        fallback={getFirstTwoCapitals(media.title)}
+                        className=''
+                    />
 
-                    <ProgressCircle rating={media.rating}></ProgressCircle>
 
-                    <span className="ml-4 line-clamp-2 text-start">{media.title}</span>
+                    {/* <img className='w-1/4 h-20 object-cover' src='https://cdn.prod.website-files.com/64479cbddbde2b42cebe552a/670e4c1fdec561d0419f4098_670e4be66e34c8126df5c591_670e4888efe72ee66f962fee_670e2e2c4421c5eb50a25db1_670e28900575f08fa68d13de_670e24b04b526202fa50647d_670e1c95221517c9ae85e314_Untitled%25252525252520design%25252525252520(17).jpeg' /> */}
+
+                    <div className='ml-4 flex flex-col flex-1'>
+                        <span className="line-clamp-2 text-start">{media.title}</span>
+                        <div className='flex items-center'>
+                            <Progress value={(media.rating ?? 0) * 10} size="1" color={getProgressColor(media.rating ?? 0)} />
+                            <span className=' ml-2 text-gray-500'>{media.rating ?? "N/A"}</span>
+                            
+                        </div>
+                        
+                        {/* <ProgressCircle rating={media.rating}></ProgressCircle> */}
+                    </div>
+
+                    
 
                 </div>
             </MediaDialog>
@@ -66,6 +85,33 @@ export default function MediaCard({ media, onEdit, onDelete }:
 
     )
 }
+
+function getProgressColor(rating: number) {
+    if (rating < 4) {
+        return 'ruby';
+    }
+    if (rating < 8) {
+        return "amber";
+    }
+    if (rating == 10) {
+        return "iris"
+    }
+    return 'jade';
+}
+
+function getFirstTwoCapitals(str: String) {
+    let capitals = "";
+    for (let i = 0; i < str.length; i++) {
+        if (str[i] === str[i].toUpperCase() && str[i].match(/[A-Z]/)) {
+            capitals += str[i];
+            if (capitals.length === 2) {
+                break;
+            }
+        }
+    }
+    return capitals;
+}
+
 
 // TODO: update
 export function StaticMediaCard({ title, rating }: { title: string, rating: number | null }) {
