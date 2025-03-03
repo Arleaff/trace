@@ -25,12 +25,13 @@ export async function createSession(token: string, userId: number): Promise<Sess
 export async function validateSessionToken(token: string): Promise<SessionValidationResult> {
     const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
-    const [row] = await db`SELECT user_session.id, user_session.user_id, user_session.expires_at, app_user.id 
+    // google ID may not be needed
+    const [row] = await db`SELECT user_session.id, user_session.user_id, user_session.expires_at, app_user.id, app_user.username, app_user.google_id
     FROM "MediaTracker".user_session AS user_session 
     INNER JOIN "MediaTracker".app_user ON app_user.id = user_session.user_id 
-    WHERE user_session.id = ${sessionId}`;
+    WHERE user_session.id = ${sessionId}`;    
+    
 
-    //TODO something is wrong here
     if (row === undefined) {
         return { session: null, user: null };
     }
@@ -42,7 +43,7 @@ export async function validateSessionToken(token: string): Promise<SessionValida
     const user: User = {
         id: row.id,
         name: row.username,
-        googleId: row.google_Id
+        googleId: row.google_id
     };
     if (Date.now() >= session.expiresAt.getTime()) {
         const [result] = await db`DELETE FROM "MediaTracker".user_session WHERE id = ${session.id}`;
@@ -51,7 +52,7 @@ export async function validateSessionToken(token: string): Promise<SessionValida
     }
     if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 15) {
         session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
-        await db`PDATE user_session SET expires_at = ${session.expiresAt} WHERE id = ${session.id}`;
+        await db`UPDATE user_session SET expires_at = ${session.expiresAt} WHERE id = ${session.id}`;
     }
     return { session, user };
 }

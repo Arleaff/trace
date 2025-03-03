@@ -13,6 +13,8 @@ export default async function Page() {
 
   
   const { user } = await getCurrentSession();
+  
+  
   if (user === null) {
     return redirect("/login");
   }
@@ -20,7 +22,7 @@ export default async function Page() {
   return (
     <>
     <Theme>
-        <Home></Home>
+        <Home username={user.name} ></Home>
     </Theme>
     </>
   );

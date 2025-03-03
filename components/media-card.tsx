@@ -2,7 +2,7 @@
 import { useDraggable } from '@dnd-kit/core';
 import MediaDialog from './media-dialog';
 import { Media } from '@/app/home';
-import { Avatar, Flex, Progress } from '@radix-ui/themes';
+import { Avatar, Progress } from '@radix-ui/themes';
 
 
 
@@ -57,7 +57,7 @@ export default function MediaCard({ media, onEdit = () => { }, onDelete = () => 
                     <Avatar
                         size="4"
                         // src="https://cdn.prod.website-files.com/64479cbddbde2b42cebe552a/670e4c1fdec561d0419f4098_670e4be66e34c8126df5c591_670e4888efe72ee66f962fee_670e2e2c4421c5eb50a25db1_670e28900575f08fa68d13de_670e24b04b526202fa50647d_670e1c95221517c9ae85e314_Untitled%25252525252520design%25252525252520(17).jpeg"
-                        fallback={getFirstTwoCapitals(media.title)}
+                        fallback={getTitleLetters(media.title)}
                         className=''
                     />
 
@@ -99,7 +99,7 @@ function getProgressColor(rating: number) {
     return 'jade';
 }
 
-function getFirstTwoCapitals(str: String) {
+export function getTitleLetters(str: String) {
     let capitals = "";
     for (let i = 0; i < str.length; i++) {
         if (str[i] === str[i].toUpperCase() && str[i].match(/[A-Z]/)) {
@@ -108,6 +108,12 @@ function getFirstTwoCapitals(str: String) {
                 break;
             }
         }
+    }
+
+    if (capitals.length == 0) {
+        let letters = str.match(/(\b[a-zA-Z])/gm);
+        if (letters?.length == 2) return letters[0] + letters[1];
+        return letters?.[0] ?? "";
     }
     return capitals;
 }

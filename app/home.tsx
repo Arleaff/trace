@@ -1,7 +1,7 @@
 "use client"
 
 import CompletionLevelColumn from "@/components/column";
-import MediaCard, { StaticMediaCard } from "@/components/media-card";
+import MediaCard, { getTitleLetters, StaticMediaCard } from "@/components/media-card";
 import SideBar from "@/components/sidebar";
 import { MEDIA_LISTS } from "@/data";
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -13,10 +13,11 @@ import { RefObject, useEffect, useRef, useState } from "react";
 import { VListHandle } from "virtua";
 import MediaDialog from "@/components/media-dialog";
 import { getUserLists } from "@/db";
+import { Avatar } from "@radix-ui/themes";
 
 
 
-export default function Home() {
+export default function Home({username} : {username: string}) {
 
   // const [ userLists, setUserLists ] = useState(getUserLists("raf"))
   
@@ -216,6 +217,8 @@ export default function Home() {
                 New Item
               </Toolbar.Button>
             </MediaDialog>
+
+          <Avatar fallback={getTitleLetters(username)} radius={"full"} className=" fixed top-0 right-0 m-2" />
 
 
         </Toolbar.Root>
