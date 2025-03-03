@@ -63,7 +63,8 @@ export async function GET(request: Request): Promise<Response> {
 
     // TODO: maybe define createUser() function elsewhere
     // Profile picture would go here
-    const [user] = await db`INSERT INTO "MediaTracker".app_user (username, google_id) VALUES (${username}, ${googleUserId})`
+    // creates a user and gets their id, should probably be defined elsewhere
+    const [user] = await db`INSERT INTO "MediaTracker".app_user (username, google_id) VALUES (${username}, ${googleUserId}) RETURNING id`     
 
     const sessionToken = generateSessionToken();
     const session = await createSession(sessionToken, user.id);
