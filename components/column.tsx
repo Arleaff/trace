@@ -1,6 +1,6 @@
 "use client";
 
-import { CompletionLevels } from '@/app/page';
+import { CompletionLevels } from '@/app/home';
 import { useDroppable } from '@dnd-kit/core';
 import { RefObject, useState } from 'react';
 import { VList, VListHandle } from 'virtua';

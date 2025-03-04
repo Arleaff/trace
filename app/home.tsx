@@ -1,7 +1,7 @@
 "use client"
 
 import CompletionLevelColumn from "@/components/column";
-import MediaCard, { getTitleLetters, StaticMediaCard } from "@/components/media-card";
+import MediaCard, { getTitleLetters } from "@/components/media-card";
 import SideBar from "@/components/sidebar";
 import { MEDIA_LISTS } from "@/data";
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
@@ -62,7 +62,7 @@ export default function Home({username} : {username: string}) {
       hoverColor: "rgb(128 128 128 / .1)",
       ref: useRef<VListHandle>(null)
     },
-    "Watching": {
+    "Ongoing": {
       hoverColor: "rgb(82 204 207 / .2)",
       ref: useRef<VListHandle>(null)
     },
@@ -152,11 +152,11 @@ export default function Home({username} : {username: string}) {
       
       <div className="min-w-fit h-full flex flex-col flex-1">
         
-        <Toolbar.Root id="toolbar" className="flex flex-none gap-2 justify-center py-4" >
+        <Toolbar.Root id="toolbar" className="flex flex-none gap-2 justify-center py-4 h-fit" >
           <div id="search" className="flex items-center border rounded-md px-2">
             <MagnifyingGlassIcon/>
             <input 
-              type="text" id="search" className="mx-2 outline-none" autoComplete="off" 
+              type="text" id="search" className="mx-2 outline-none h-6" autoComplete="off" 
               onInput={ (e) => {
                 setSearch((e.target as HTMLInputElement).value)
               }}
@@ -320,7 +320,7 @@ export default function Home({username} : {username: string}) {
 
 
 
-export const COMPLETION_LEVELS = ['Unstarted', 'Watching', 'Finished', 'Dropped'] as const;
+export const COMPLETION_LEVELS = ['Unstarted', 'Ongoing', 'Finished', 'Dropped'] as const;
 export type CompletionLevels = typeof COMPLETION_LEVELS[number];
 
 export type MediaSort =

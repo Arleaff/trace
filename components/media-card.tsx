@@ -120,21 +120,21 @@ export function getTitleLetters(str: String) {
 
 
 // TODO: update
-export function StaticMediaCard({ title, rating }: { title: string, rating: number | null }) {
+// export function StaticMediaCard({ title, rating }: { title: string, rating: number | null }) {
 
 
-    return (
-        <div
-            className='max-w-sm'
-        >
-            <div aria-describedby=''
-                className="flex flex-row items-center border-2 rounded-xl px-3 py-2 select-none shadow-sm hover:shadow-md bg-white hover:cursor-grabbing">
-                <StaticProgressCircle rating={rating} />
-                <span className=" ml-4 line-clamp-2">{title}</span>
-            </div>
-        </div>
-    )
-}
+//     return (
+//         <div
+//             className='max-w-sm'
+//         >
+//             <div aria-describedby=''
+//                 className="flex flex-row items-center border-2 rounded-xl px-3 py-2 select-none shadow-sm hover:shadow-md bg-white hover:cursor-grabbing">
+//                 <StaticProgressCircle rating={rating} />
+//                 <span className=" ml-4 line-clamp-2">{title}</span>
+//             </div>
+//         </div>
+//     )
+// }
 
 function StaticProgressCircle({ rating }: { rating: number | null }) {
     const size = 60

@@ -5,14 +5,14 @@ export const MEDIA_LISTS: {
     media: Media[];
 }[] = [ 
     {   listName: "Anime",
-        // media: [...Array(1000).keys()].map( i => { return { title: i.toString(), rating: null, completionLevel: "Watching", extra: null }} )
+        // media: [...Array(1000).keys()].map( i => { return { title: i.toString(), rating: null, completionLevel: "Ongoing", extra: null }} )
         media: [
             { title: "Bleach", rating: null, completionLevel: "Unstarted", extra: null },
             { title: "HxH", rating: 10, completionLevel: "Finished", extra: null },
 
-            { title: "Naruto", rating: 8.5, completionLevel: "Watching", extra: null },
-            { title: "Re:Zero", rating: 9.5, completionLevel: "Watching", extra: null },
-            { title: "That Time I Got Reincarnated as a Slime", rating: 8, completionLevel: "Watching", extra: null },
+            { title: "Naruto", rating: 8.5, completionLevel: "Ongoing", extra: null },
+            { title: "Re:Zero", rating: 9.5, completionLevel: "Ongoing", extra: null },
+            { title: "That Time I Got Reincarnated as a Slime", rating: 8, completionLevel: "Ongoing", extra: null },
 
             { title: "Attack on Titan", rating: 10, completionLevel: "Finished", extra: null },
             { title: "Cyberpunk Edgerunners", rating: 10, completionLevel: "Finished", extra: null },
@@ -34,7 +34,7 @@ export const MEDIA_LISTS: {
         media: [
             { title: "Control", rating: null, completionLevel: "Unstarted", extra: null },
 
-            { title: "God of War: Ragnarok", rating: null, completionLevel: "Watching", extra: null },
+            { title: "God of War: Ragnarok", rating: null, completionLevel: "Ongoing", extra: null },
 
             { title: "Subanautica", rating: 10, completionLevel: "Finished", extra: null },
             { title: "God of War (2018)", rating: 9.5, completionLevel: "Finished", extra: null }, // perfect example of why edits are necessary, used to be "God of War"
