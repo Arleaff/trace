@@ -34,7 +34,15 @@ export const MediaCard = memo(function MediaCard({ media, onEdit = () => { }, on
 
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: media.title,
+        data: {
+            title: media.title,
+            rating: media.rating,
+            completionLevel: media.completionLevel
+        }
     });
+
+    // const { title, extra, completionLevel, rating } = activeMedia!
+
 
     const style: React.CSSProperties = {
         opacity: isDragging ? "0.5" : "1",

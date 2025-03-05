@@ -38,34 +38,34 @@ export default function DragView({search, sort} : {search: string, sort: MediaSo
     const [filter, setFilter] = useState<CompletionLevel | null>(null)
 
     const [mediaList, setMediaList ] = useState(MEDIA_LISTS[0].media)
-    const [activeMedia, setActiveMedia] = useState<Media | null>(null);  
+    // const [activeMedia, setActiveMedia] = useState<string | null>(null);  
 
     const formatMedia = function formatMedia(completionLevel: string) {
         let formattedMedia: Media[] = mediaList.filter(media => media.completionLevel == completionLevel)        
         
-        // if (search.trim().length != 0) {
-        //     formattedMedia = formattedMedia.filter(media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase()) || media.extra?.toLocaleLowerCase().includes(search.toLocaleLowerCase())) 
-        // }
+        if (search.trim().length != 0) {
+            formattedMedia = formattedMedia.filter(media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase())) 
+        }
 
-        // switch (sort) {
+        switch (sort) {
 
-        //     case 'alphabetical':
-        //     return formattedMedia.sort((a, b) => a.title.localeCompare(b.title))
-        //     default:
-        //     case "highest_rating":
-        //     return formattedMedia.sort((a, b) => {
-        //         // nulls sort after anything else
-        //         if (a.rating === null) {
-        //         return 1;
-        //         }
-        //         if (b.rating === null) {
-        //         return -1;
-        //         }
+            case 'alphabetical':
+            return formattedMedia.sort((a, b) => a.title.localeCompare(b.title))
+            default:
+            case "highest_rating":
+            return formattedMedia.sort((a, b) => {
+                // nulls sort after anything else
+                if (a.rating === null) {
+                return 1;
+                }
+                if (b.rating === null) {
+                return -1;
+                }
 
-        //         return b.rating - a.rating
-        //     })
-        // }
-        return formattedMedia
+                return b.rating - a.rating
+            })
+        }
+        // return formattedMedia
     }
     
 
@@ -76,38 +76,40 @@ export default function DragView({search, sort} : {search: string, sort: MediaSo
     );
 
     const onDragStart = useCallback( (event: DragStartEvent) => {
-        const title = event.active.id
-        setActiveMedia(mediaList.find(m => m.title == title)!)
+        // const title = event.active.id
+        // setActiveMedia(mediaList.find(m => m.title == title)!.title)
         }
-    , [mediaList])
+    , [mediaList.length])
 
     const onDragEnd = useCallback(() => {
-        setActiveMedia(null)
+        // setActiveMedia(null)
     }
     , [])
 
     const onDragOver = useCallback((event: DragOverEvent) => {
-        const { title, extra, completionLevel, rating } = activeMedia!
-        // const title = event.active.id
+        console.log(event.active.data.current);
+
+
+        let activeMedia = event.active.data.current as Media
+        const { title, completionLevel, rating } = activeMedia
+        
 
         const overContainer = event.over?.id
-        console.log(overContainer);
         
         let newCompletionLevel = COMPLETION_LEVELS.find(value => value == overContainer)
+        console.log(newCompletionLevel);
+        
 
 
-        if (completionLevel == newCompletionLevel || !newCompletionLevel) {
-            console.log("returned");
-            
+        if (completionLevel == newCompletionLevel || !newCompletionLevel) {  
             return
         }
 
         setMediaList((prevState) => (prevState.map((media) => media.title == activeMedia?.title ? { ...activeMedia, completionLevel: newCompletionLevel } : media)))
-        setActiveMedia({ title, rating, completionLevel: newCompletionLevel, extra })
         CategoryInfo[newCompletionLevel].ref.current?.scrollToIndex(formatMedia(newCompletionLevel).indexOf(activeMedia!))
 
         }
-    , [activeMedia])
+    , [])
 
     const onEdit = useCallback( (updatedMedia: Media, originalMedia: Media | undefined) => {
         setMediaList((oldList) => oldList.map((oldMedia) => oldMedia.title == originalMedia?.title ? updatedMedia : oldMedia));
@@ -124,7 +126,7 @@ export default function DragView({search, sort} : {search: string, sort: MediaSo
             setFilter(newFilter as CompletionLevel)
             return newFilter
         }
-    ,[filter])
+    , [filter])
 
     return ( <>
 
@@ -140,8 +142,6 @@ export default function DragView({search, sort} : {search: string, sort: MediaSo
                 COMPLETION_LEVELS.map(completionLevel =>
                 ((filter == null || filter == completionLevel) &&                
                     <CompletionLevelColumn
-                        VListRef={CategoryInfo[completionLevel].ref}
-                        hover={activeMedia?.completionLevel == completionLevel}
                         onFilter={onFilter}
                         completionLevel={completionLevel} key={completionLevel} hoverColor={CategoryInfo[completionLevel].hoverColor}
                         // mediaList={formatMedia(completionLevel)}
@@ -150,7 +150,6 @@ export default function DragView({search, sort} : {search: string, sort: MediaSo
                         >
                         <VList
                             ref={CategoryInfo[completionLevel].ref}
-                            style={{ height: 700 }}
                         >
                             {formatMedia(completionLevel).map((media) =>
                                 <MediaCard
@@ -170,8 +169,7 @@ export default function DragView({search, sort} : {search: string, sort: MediaSo
             }
 
             <DragOverlay>
-                {/* {activeMedia && <StaticMediaCard title={activeMedia.title} rating={activeMedia.rating} ></StaticMediaCard>} */}
-                {activeMedia && <MediaCard media={activeMedia} ></MediaCard>}
+                {<MediaCard media={{ title: "Control", rating: null, completionLevel: "Unstarted" }} ></MediaCard>}
             </DragOverlay>
 
         </DndContext>

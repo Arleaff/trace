@@ -7,21 +7,20 @@ import { VList, VListHandle } from 'virtua';
 import { MediaCard } from './media-card';
 
 
-export const CompletionLevelColumn = memo(function CompletionLevelColumn({ children, completionLevel, hoverColor, hover, onFilter, VListRef, onEdit, onDelete }: 
+export const CompletionLevelColumn = memo(function CompletionLevelColumn({ children, completionLevel, hoverColor, onFilter, onEdit, onDelete }: 
     {
-        children?: React.ReactNode, completionLevel: string, hoverColor: string, onFilter: (lvl: CompletionLevel) => CompletionLevel | null, hover: boolean,
-        VListRef: RefObject<VListHandle | null>,
+        children?: React.ReactNode, completionLevel: string, hoverColor: string, onFilter: (lvl: CompletionLevel) => CompletionLevel | null,
         onEdit: (newMedia: Media, originalMedia: Media | undefined) => any, onDelete: (originalMedia: Media | undefined) => any
 }) {
 
     const [ gridView, setGridView ] = useState(false)
 
-    const { setNodeRef } = useDroppable({
+    const { setNodeRef, isOver, over } = useDroppable({
         id: completionLevel,
     });
 
     const categoryStyle: React.CSSProperties = {
-        backgroundColor: hover ? hoverColor : "white",
+        backgroundColor: isOver ? hoverColor : "white",
         transition: "background-color ease-in-out .5s",
     };
 

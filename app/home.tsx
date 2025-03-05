@@ -30,7 +30,7 @@ export default function Home({username} : {username: string}) {
     let formattedMedia: Media[] = mediaList.filter(media => media.completionLevel == completionLevel)
     
     if (search.trim().length != 0) {
-      formattedMedia = formattedMedia.filter(media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase()) || media.extra?.toLocaleLowerCase().includes(search.toLocaleLowerCase())) 
+      formattedMedia = formattedMedia.filter(media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase())) 
     }
 
     switch (sort) {
@@ -192,7 +192,6 @@ export type MediaSort =
 
 export type Media = {
   title: string;
-  extra: string | null;
   rating: number | null;
   completionLevel: CompletionLevel;
 }
