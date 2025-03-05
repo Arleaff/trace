@@ -4,6 +4,8 @@ import MediaDialog from './media-dialog';
 import { Media } from '@/app/home';
 import { Avatar, Progress } from '@radix-ui/themes';
 import { memo } from 'react';
+import { CSS } from '@dnd-kit/utilities';
+import { Portal } from 'radix-ui';
 
 
 
@@ -32,7 +34,7 @@ export const MediaCard = memo(function MediaCard({ media, onEdit = () => { }, on
         onEdit?: (newMedia: Media, originalMedia: Media | undefined) => any, onDelete?: (originalMedia: Media | undefined) => any
     }) {
 
-    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    const { attributes, listeners, setNodeRef, isDragging, transform } = useDraggable({
         id: media.title,
         data: {
             title: media.title,
@@ -46,6 +48,8 @@ export const MediaCard = memo(function MediaCard({ media, onEdit = () => { }, on
 
     const style: React.CSSProperties = {
         opacity: isDragging ? "0.5" : "1",
+        transform: CSS.Translate.toString(transform),
+        position: isDragging ? 'fixed' : "relative",
     };
 
     const CardChildren = memo(() => {
@@ -68,25 +72,41 @@ export const MediaCard = memo(function MediaCard({ media, onEdit = () => { }, on
 
     return (
         <>
-            <div
-                ref={setNodeRef}
-                style={style}
-                {...listeners}
-                {...attributes}
-                aria-describedby=''
-                className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
-            >
-                <CardChildren>
+        {/* Render in portal when dragging */}
+        { isDragging ? 
+                    <Portal.Root asChild>
+                        <div
+                            ref={setNodeRef}
+                            style={style}
+                            {...listeners}
+                            {...attributes}
+                            aria-describedby=''
+                            className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
+                        >
+                            <CardChildren/>
+                        </div>
+                    </Portal.Root>
+        :
+                    <div
+                        ref={setNodeRef}
+                        style={style}
+                        {...listeners}
+                        {...attributes}
+                        aria-describedby=''
+                        className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
+                    >
+                        <CardChildren />
+                    </div>
+        }
 
-                </CardChildren>
-                
-            </div>
         </>
 
 
 
     )
 })
+
+
 
 function getProgressColor(rating: number) {
     if (rating < 4) {

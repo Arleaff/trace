@@ -168,9 +168,9 @@ export default function DragView({search, sort} : {search: string, sort: MediaSo
                 )
             }
 
-            <DragOverlay>
+            {/* <DragOverlay>
                 {<MediaCard media={{ title: "Control", rating: null, completionLevel: "Unstarted" }} ></MediaCard>}
-            </DragOverlay>
+            </DragOverlay> */}
 
         </DndContext>
 
