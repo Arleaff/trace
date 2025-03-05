@@ -1,4 +1,4 @@
-import { COMPLETION_LEVELS, CompletionLevels, Media } from "@/app/home";
+import { COMPLETION_LEVELS, CompletionLevel, Media } from "@/app/home";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Select from "@radix-ui/react-select";
 import { Label } from "@radix-ui/react-label";
@@ -7,9 +7,9 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { useRef, useState } from "react";
 
 export default function MediaDialog(
-    { children, dialogTitle, description = undefined, confirmText = "Confirm", altText = "Cancel", onConfirm, onAlt = () =>{}, media = undefined } 
+    { children, dialogTitle, description = undefined, confirmText = "Confirm", altText = "Cancel", onConfirm, onAlt = () =>{ }, media = undefined } 
     : { children?: React.ReactNode, dialogTitle: string, description?: string, confirmText?: string, altText?: string, 
-            onConfirm: (arg0: Media) => any, onAlt?: () => any, 
+            onConfirm: (newMedia: Media, originalMedia: Media | undefined) => any, onAlt?: (originalMedia: Media | undefined) => any, 
             media?: Media
     },) {
 
@@ -18,6 +18,10 @@ export default function MediaDialog(
     const [category, setCategory] = useState(media?.completionLevel)
 
     const formRef = useRef<HTMLFormElement>(null)
+
+    const onClickAlt = () => {
+        onAlt(media)
+    }
 
     return (
         <>
@@ -47,7 +51,7 @@ export default function MediaDialog(
                                 const extra = formData.get("extra");
                                 const rating = formData.get("rating");
 
-                                await onConfirm( { title, rating, completionLevel: category, extra } as Media)
+                                await onConfirm( { title, rating, completionLevel: category, extra } as Media, media)
                                 setOpen(false)
                             }}
                         >
@@ -86,7 +90,7 @@ export default function MediaDialog(
                                 Category
                                 <Select.Root
                                     onValueChange={(value) => {
-                                        setCategory(value as CompletionLevels)
+                                        setCategory(value as CompletionLevel)
                                     }}
                                     defaultValue={media?.completionLevel as string}
                                 >
@@ -127,7 +131,7 @@ export default function MediaDialog(
 
                             <div id="buttons" className="mt-[25px] flex justify-between">
                                 <Dialog.Close asChild>
-                                    <button onClick={onAlt}
+                                    <button onClick={onClickAlt}
                                      type='submit' className="inline-flex h-[35px] items-center justify-center rounded bg-green4 px-[15px] font-medium leading-none text-green11 hover:bg-green5 focus:shadow-[0_0_0_2px] focus:shadow-green7 focus:outline-none">
                                         {altText}
                                     </button>

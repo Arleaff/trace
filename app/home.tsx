@@ -1,19 +1,18 @@
 "use client"
 
-import CompletionLevelColumn from "@/components/column";
-import MediaCard, { getTitleLetters } from "@/components/media-card";
+import { getTitleLetters, MediaCard } from "@/components/media-card";
 import SideBar from "@/components/sidebar";
 import { MEDIA_LISTS } from "@/data";
-import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { CaretSortIcon, MagnifyingGlassIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import * as Select from "@radix-ui/react-select";
 
-import { RefObject, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { VListHandle } from "virtua";
 import MediaDialog from "@/components/media-dialog";
 import { getUserLists } from "@/db";
 import { Avatar } from "@radix-ui/themes";
+import DragView from "@/components/drag-view";
 
 
 
@@ -22,8 +21,6 @@ export default function Home({username} : {username: string}) {
   // const [ userLists, setUserLists ] = useState(getUserLists("raf"))
   
   const [mediaList, setMediaList ] = useState(MEDIA_LISTS[0].media)
-
-  const [filter, setFilter] = useState<CompletionLevels | null>(null)
 
   const [search, setSearch ] = useState<string>("")
   const [sort, setSort] = useState<MediaSort>("highest_rating")
@@ -57,26 +54,7 @@ export default function Home({username} : {username: string}) {
 
   }
 
-  const CategoryInfo: MediaMap = {
-    "Unstarted": {
-      hoverColor: "rgb(128 128 128 / .1)",
-      ref: useRef<VListHandle>(null)
-    },
-    "Ongoing": {
-      hoverColor: "rgb(82 204 207 / .2)",
-      ref: useRef<VListHandle>(null)
-    },
-    "Finished": {
-      hoverColor: "rgb( 64 201 103 / .15)",
-      ref: useRef<VListHandle>(null)
-    },
-    "Dropped": {
-      hoverColor: "rgb(243 16 141 / .1)",
-      ref: useRef<VListHandle>(null)
-    },
-  }
 
-  const [activeMedia, setActiveMedia] = useState<Media | null>(null);  
 
   function customCoordinatesGetter(event: { code: any; }, args: any) {
 
@@ -111,37 +89,7 @@ export default function Home({username} : {username: string}) {
 
     return undefined;
   };
-  
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 1 }
-    }),
-    // useSensor(KeyboardSensor, {
-    //   coordinateGetter: customCoordinatesGetter,
-    // })
-  );
 
-  // animate rating circle on load
-  useEffect(() => {
-    const circleProgress = document.querySelectorAll(".progress");
-
-    const progressAnimation: Keyframe[] = [
-      { strokeDashoffset: "157.07963267948966" },
-      {},
-    ];
-
-    const progressTiming: KeyframeAnimationOptions = {
-      duration: 500,
-      iterations: 1,
-      easing: "ease-in-out",
-      delay: 0
-    };
-
-    circleProgress.forEach((node) => {
-      node.animate(progressAnimation, progressTiming)
-    })
-    
-  }, [])
 
   return (
     // find alternative to overflow hidden
@@ -224,93 +172,7 @@ export default function Home({username} : {username: string}) {
         </Toolbar.Root>
 
         <div className="flex flex-row flex-1 p-2 pb-2 overflow-x-hidden">
-
-          <DndContext
-            sensors={sensors}
-            // collisionDetection={closestCenter}
-            onDragStart={
-              (event) => {
-                const title = event.active.id
-                setActiveMedia(mediaList.find(m => m.title == title)!)
-              }
-            }
-            onDragEnd={
-              () => {
-                setActiveMedia(null)
-              }
-            }
-            onDragOver={(event) => {
-              const { title, extra, completionLevel, rating } = activeMedia!
-
-
-              // const title = event.active.id
-
-              const overContainer = event.over?.id
-
-              let newCompletionLevel = COMPLETION_LEVELS.find(value => value == overContainer)
-
-
-              if (completionLevel == newCompletionLevel || !newCompletionLevel) {
-                return
-              }
-              
-              setMediaList( (prevState) => (prevState.map( (media) => media.title == activeMedia?.title ? {...activeMedia, completionLevel: newCompletionLevel} : media )))
-
-              setActiveMedia({ title, rating, completionLevel: newCompletionLevel, extra })
-
-              CategoryInfo[newCompletionLevel].ref.current?.scrollToIndex(formatMedia(newCompletionLevel).indexOf(activeMedia!))
-
-            }}
-          >
-
-
-            {
-
-              COMPLETION_LEVELS.map(completionLevel =>
-              ((filter == null || filter == completionLevel) &&
-
-                <CompletionLevelColumn
-                  VListRef={CategoryInfo[completionLevel].ref}
-                  hover={activeMedia?.completionLevel == completionLevel}
-                  onFilter={() => {
-                    const newFilter: CompletionLevels | null = filter ? null : completionLevel as CompletionLevels
-
-                    setFilter(newFilter as CompletionLevels)
-                    return newFilter
-                  }}
-                  completionLevel={completionLevel} key={completionLevel} hoverColor={CategoryInfo[completionLevel].hoverColor
-                  }>
-
-                  {formatMedia(completionLevel).map((media) => 
-                    <MediaCard 
-                      media={media}
-                      key={media.title}
-                      onEdit={(updatedMedia) => {
-                        setMediaList((oldList) => oldList.map((oldMedia) => oldMedia.title == media.title ? updatedMedia : oldMedia));
-                      } } 
-                      
-                      onDelete={ () => {
-                        setMediaList((oldList) => oldList.filter((oldMedia) => oldMedia.title != media.title))
-                      } }                      />)
-                  }
-
-                </CompletionLevelColumn>
-
-              )
-
-              )
-            }
-
-            <DragOverlay>
-              {/* {activeMedia && <StaticMediaCard title={activeMedia.title} rating={activeMedia.rating} ></StaticMediaCard>} */}
-              {activeMedia && <MediaCard media={activeMedia} ></MediaCard>}
-            </DragOverlay>
-
-          </DndContext>
-
-
-
-
+          <DragView search={search} sort={sort}></DragView>
         </div>
       </div>
 
@@ -321,7 +183,7 @@ export default function Home({username} : {username: string}) {
 
 
 export const COMPLETION_LEVELS = ['Unstarted', 'Ongoing', 'Finished', 'Dropped'] as const;
-export type CompletionLevels = typeof COMPLETION_LEVELS[number];
+export type CompletionLevel = typeof COMPLETION_LEVELS[number];
 
 export type MediaSort =
   | 'alphabetical'
@@ -332,13 +194,8 @@ export type Media = {
   title: string;
   extra: string | null;
   rating: number | null;
-  completionLevel: CompletionLevels;
+  completionLevel: CompletionLevel;
 }
 
-interface MediaMap {
-  [key: string]: {
-    hoverColor: string,
-    ref: RefObject<VListHandle | null>
-  }
-}
+
 
