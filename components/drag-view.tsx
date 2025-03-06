@@ -2,7 +2,7 @@ import { COMPLETION_LEVELS, CompletionLevel, Media, MediaSort } from "@/app/home
 import { CompletionLevelColumn } from "@/components/column";
 import { MEDIA_LISTS } from "@/data";
 
-import { DndContext, DragOverEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { VList, VListHandle } from "virtua";
 import { MediaCard } from "./media-card";
@@ -81,32 +81,17 @@ export default function DragView({search, sort} : {search: string, sort: MediaSo
         }
     , [mediaList.length])
 
-    const onDragEnd = useCallback(() => {
+    const onDragEnd = useCallback((event: DragEndEvent) => {
         // setActiveMedia(null)
+        let newCompletionLevel = event.over?.id as CompletionLevel
+        let dragged = { ...event.active.data.current, completionLevel: newCompletionLevel } as Media
+        setMediaList((prevState) => (prevState.map((media) => media.title == dragged?.title ? { ...dragged, completionLevel: newCompletionLevel } : media)))
+        CategoryInfo[newCompletionLevel].ref.current?.scrollToIndex(formatMedia(newCompletionLevel).indexOf(dragged))
+
     }
     , [])
 
     const onDragOver = useCallback((event: DragOverEvent) => {
-        console.log(event.active.data.current);
-
-
-        let activeMedia = event.active.data.current as Media
-        const { title, completionLevel, rating } = activeMedia
-        
-
-        const overContainer = event.over?.id
-        
-        let newCompletionLevel = COMPLETION_LEVELS.find(value => value == overContainer)
-        console.log(newCompletionLevel);
-        
-
-
-        if (completionLevel == newCompletionLevel || !newCompletionLevel) {  
-            return
-        }
-
-        setMediaList((prevState) => (prevState.map((media) => media.title == activeMedia?.title ? { ...activeMedia, completionLevel: newCompletionLevel } : media)))
-        CategoryInfo[newCompletionLevel].ref.current?.scrollToIndex(formatMedia(newCompletionLevel).indexOf(activeMedia!))
 
         }
     , [])
@@ -150,6 +135,7 @@ export default function DragView({search, sort} : {search: string, sort: MediaSo
                         >
                         <VList
                             ref={CategoryInfo[completionLevel].ref}
+                            className="className='no-scrollbar h-full overflow-y-scroll flex flex-col'"
                         >
                             {formatMedia(completionLevel).map((media) =>
                                 <MediaCard

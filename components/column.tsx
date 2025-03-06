@@ -15,7 +15,7 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ child
 
     const [ gridView, setGridView ] = useState(false)
 
-    const { setNodeRef, isOver, over } = useDroppable({
+    const { setNodeRef, isOver } = useDroppable({
         id: completionLevel,
     });
 
