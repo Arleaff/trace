@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { decodeIdToken } from "arctic";
 
 import type { OAuth2Tokens } from "arctic";
-import { google } from "@/auth/oath";
+import { google } from "@/auth/oauth";
 import { createSession, generateSessionToken, setSessionTokenCookie } from "@/auth/session";
 import { db } from "@/db";
 import { ObjectParser } from "@pilcrowjs/object-parser";
@@ -40,12 +40,13 @@ export async function GET(request: Request): Promise<Response> {
     const googleUserId = claimsParser.getString("sub");
     const username = claimsParser.getString("name");
 
-    // TODO: Images
+    // TODO: Images/Profile picture
     // const picture = claimsParser.getString("picture");
 
 
 
     const [existingUser] = await db`SELECT * FROM "MediaTracker".app_user WHERE google_id = ${googleUserId}`;    
+    
     
 
     if (existingUser !== undefined) {
@@ -61,7 +62,9 @@ export async function GET(request: Request): Promise<Response> {
     }
 
     // TODO: maybe define createUser() function elsewhere
-    const [user] = await db`INSERT INTO "MediaTracker".app_user (username, google_id) VALUES (${username}, ${googleUserId})`
+    // Profile picture would go here
+    // creates a user and gets their id, should probably be defined elsewhere
+    const [user] = await db`INSERT INTO "MediaTracker".app_user (username, google_id) VALUES (${username}, ${googleUserId}) RETURNING id`     
 
     const sessionToken = generateSessionToken();
     const session = await createSession(sessionToken, user.id);

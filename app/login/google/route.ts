@@ -1,4 +1,4 @@
-import { google } from "@/auth/oath";
+import { google } from "@/auth/oauth";
 import { generateState, generateCodeVerifier } from "arctic";
 import { cookies } from "next/headers";
 

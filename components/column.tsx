@@ -1,26 +1,26 @@
 "use client";
 
-import { CompletionLevels } from '@/app/page';
+import { CompletionLevel, Media } from '@/app/home';
 import { useDroppable } from '@dnd-kit/core';
-import { RefObject, useState } from 'react';
+import { memo, RefObject, useState } from 'react';
 import { VList, VListHandle } from 'virtua';
+import { MediaCard } from './media-card';
 
 
-export default function CompletionLevelColumn({ children, completionLevel, hoverColor, hover, onFilter, VListRef }: 
+export const CompletionLevelColumn = memo(function CompletionLevelColumn({ children, completionLevel, hoverColor, onFilter, onEdit, onDelete }: 
     {
-        children?: React.ReactNode, completionLevel: string, hoverColor: string, onFilter: () => CompletionLevels | null, hover: boolean,
-        VListRef: RefObject<VListHandle | null>
-
+        children?: React.ReactNode, completionLevel: string, hoverColor: string, onFilter: (lvl: CompletionLevel) => CompletionLevel | null,
+        onEdit: (newMedia: Media, originalMedia: Media | undefined) => any, onDelete: (originalMedia: Media | undefined) => any
 }) {
 
     const [ gridView, setGridView ] = useState(false)
 
-    const { setNodeRef } = useDroppable({
+    const { setNodeRef, isOver } = useDroppable({
         id: completionLevel,
     });
 
     const categoryStyle: React.CSSProperties = {
-        backgroundColor: hover ? hoverColor : "white",
+        backgroundColor: isOver ? hoverColor : "white",
         transition: "background-color ease-in-out .5s",
     };
 
@@ -30,8 +30,7 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
         justifyItems: "center"
 
 
-    };    
-
+    };
 
     return (
         // TODO: apply min width at a higher level
@@ -39,7 +38,7 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
         <div id={completionLevel} ref={setNodeRef} style={categoryStyle} className="flex flex-1 flex-col p-2 rounded-xl overflow-x-hidden min-w-56">
             
             <span onClick={ () => {
-                setGridView(onFilter() != null) // call filter function and use value to set column view
+                setGridView(onFilter(completionLevel as CompletionLevel) != null) // call filter function and use value to set column view
             }} 
                 className="border rounded-lg w-fit px-5 hover:cursor-pointer bg-white mb-3 select-none"
             >{completionLevel}</span>
@@ -56,12 +55,12 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
                     </div>
                 :
                 // TODO: see if height changes performance
-                    <VList
-                        ref={VListRef}
-                        className='no-scrollbar h-full overflow-y-scroll flex'
-                        >
+                    <div className='no-scrollbar h-full overflow-y-scroll flex flex-col'
+>
                         {children}
-                    </VList>
+
+                </div>
+                    
 
             }
             
@@ -69,4 +68,4 @@ export default function CompletionLevelColumn({ children, completionLevel, hover
             
         </div>
     );
-}
+})
