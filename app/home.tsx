@@ -13,6 +13,9 @@ import MediaDialog from "@/components/media-dialog";
 import { getUserLists } from "@/db";
 import { Avatar } from "@radix-ui/themes";
 import DragView from "@/components/drag-view";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "./store";
+import { setSearch, setSort } from "@/mediaSlice";
 
 
 
@@ -22,37 +25,13 @@ export default function Home({username} : {username: string}) {
   
   const [mediaList, setMediaList ] = useState(MEDIA_LISTS[0].media)
 
-  const [search, setSearch ] = useState<string>("")
-  const [sort, setSort] = useState<MediaSort>("highest_rating")
+  const sort = useSelector((state: RootState) => state.sort.value)
+  const search = useSelector((state: RootState) => state.search.value)
+  const dispatch: AppDispatch = useDispatch()
 
-  const formatMedia = function formatMedia(completionLevel: string) {
+  // const [search, setSearch ] = useState<string>("")
+  // const [sort, setSort] = useState<MediaSort>("highest_rating")
 
-    let formattedMedia: Media[] = mediaList.filter(media => media.completionLevel == completionLevel)
-    
-    if (search.trim().length != 0) {
-      formattedMedia = formattedMedia.filter(media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase())) 
-    }
-
-    switch (sort) {
-
-      case 'alphabetical':
-        return formattedMedia.sort((a, b) => a.title.localeCompare(b.title))
-      default:
-      case "highest_rating":
-        return formattedMedia.sort((a, b) => {
-          // nulls sort after anything else
-          if (a.rating === null) {
-            return 1;
-          }
-          if (b.rating === null) {
-            return -1;
-          }
-
-          return b.rating - a.rating
-        })
-    }
-
-  }
 
 
 
@@ -106,7 +85,7 @@ export default function Home({username} : {username: string}) {
             <input 
               type="text" id="search" className="mx-2 outline-none h-6" autoComplete="off" 
               onInput={ (e) => {
-                setSearch((e.target as HTMLInputElement).value)
+                dispatch(setSearch((e.target as HTMLInputElement).value))
               }}
             />
           </div>
@@ -114,7 +93,7 @@ export default function Home({username} : {username: string}) {
           <Select.Root
             value={sort} // can be commented out
             onValueChange={ (value) => {
-              setSort(value as MediaSort)
+              dispatch(setSort(value))
             }}
           >
             <Select.Trigger
