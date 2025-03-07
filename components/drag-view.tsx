@@ -16,7 +16,7 @@ interface MediaMap {
     }
 }
 
-export default function DragView({search, sort} : {search: string, sort: MediaSort}) {
+export default function DragView() {
 
     const CategoryInfo: MediaMap = {
         "Unstarted": {

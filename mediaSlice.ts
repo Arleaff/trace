@@ -5,19 +5,11 @@ import { Media, MediaSort } from './app/home';
 export const mediaSlice = createSlice({
     name: 'media',
     initialState: {
-        value: MEDIA_LISTS[0].media
+        value: MEDIA_LISTS[0].media.filter(media => media.completionLevel == "Unstarted")
     },
     reducers: {
-        increment: state => {
-            // Redux Toolkit allows us to write "mutating" logic in reducers. It
-            // doesn't actually mutate the state because it uses the Immer library,
-            // which detects changes to a "draft state" and produces a brand new
-            // immutable state based off those changes
-        },
-        decrement: state => {
-        },
         editMedia: (state, action) => {
-            let dragged = action.payload as Media
+            let dragged = action.payload
             state.value = state.value.map((media) => media.title == dragged?.title ? dragged : media)
         }
     }

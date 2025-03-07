@@ -151,7 +151,7 @@ export default function Home({username} : {username: string}) {
         </Toolbar.Root>
 
         <div className="flex flex-row flex-1 p-2 pb-2 overflow-x-hidden">
-          <DragView search={search} sort={sort}></DragView>
+          <DragView></DragView>
         </div>
       </div>
 

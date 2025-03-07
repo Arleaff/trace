@@ -91,16 +91,17 @@ export const CompletionLevelColumn = function CompletionLevelColumn({ children, 
                     </div>
                 :
                 // TODO: see if height changes performance
-                    <VList
-                        // ref={CategoryInfo[completionLevel].ref}
-                        className="no-scrollbar h-full overflow-y-scroll flex flex-col"
-                        style={{ height: 800 }}
-                         >
-                        {formatMedia().map((media) =>
-                            <MediaCard media={media} key={media.title}
-                                onEdit={onEdit} onDelete={onDelete} />
-                        )}
-                    </VList>
+                    <div className='no-scrollbar h-full overflow-y-scroll flex flex-col'
+>
+                        <VList 
+                            // ref={CategoryInfo[completionLevel].ref}
+                            className="no-scrollbar h-full overflow-y-scroll flex flex-col" >
+                            {formatMedia().map((media) =>
+                                <MediaCard media={media} key={media.title}
+                                    onEdit={onEdit} onDelete={onDelete} />
+                            )}
+                        </VList>
+                </div>
                     
 
             }
