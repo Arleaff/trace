@@ -2,7 +2,6 @@
 
 import { getTitleLetters, MediaCard } from "@/components/media-card";
 import SideBar from "@/components/sidebar";
-import { MEDIA_LISTS } from "@/data";
 import { CaretSortIcon, MagnifyingGlassIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import * as Select from "@radix-ui/react-select";
@@ -20,20 +19,10 @@ import { setSearch, setSort } from "@/mediaSlice";
 
 
 export default function Home({username} : {username: string}) {
-
-  // const [ userLists, setUserLists ] = useState(getUserLists("raf"))
   
-  const [mediaList, setMediaList ] = useState(MEDIA_LISTS[0].media)
-
   const sort = useSelector((state: RootState) => state.sort.value)
   const search = useSelector((state: RootState) => state.search.value)
   const dispatch: AppDispatch = useDispatch()
-
-  // const [search, setSearch ] = useState<string>("")
-  // const [sort, setSort] = useState<MediaSort>("highest_rating")
-
-
-
 
   function customCoordinatesGetter(event: { code: any; }, args: any) {
 
@@ -137,7 +126,7 @@ export default function Home({username} : {username: string}) {
             <MediaDialog 
                 dialogTitle="Create new item"
                 altText='Cancel' 
-                onConfirm={ media => { setMediaList( list => [...list, media] ) }} 
+                onConfirm={ media => { }} 
               >
 
               <Toolbar.Button className="inline-flex items-center gap-1">
@@ -161,7 +150,7 @@ export default function Home({username} : {username: string}) {
 
 
 
-export const COMPLETION_LEVELS = ['Unstarted', 'Ongoing', 'Finished', 'Dropped'] as const;
+export const COMPLETION_LEVELS = ['Pending', 'Ongoing', 'Finished', 'Dropped'] as const;
 export type CompletionLevel = typeof COMPLETION_LEVELS[number];
 
 export type MediaSort =

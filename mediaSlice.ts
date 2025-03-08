@@ -1,16 +1,25 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { MEDIA_LISTS } from "@/data";
+import { createSlice, current } from '@reduxjs/toolkit'
 import { Media, MediaSort } from './app/home';
 
 export const mediaSlice = createSlice({
     name: 'media',
     initialState: {
-        value: MEDIA_LISTS[0].media
+        value: [] as Media[],
+        currentList: ""
     },
     reducers: {
+        setCurrentList: (state, action) => {
+            state.currentList = action.payload
+        },
         editMedia: (state, action) => {
             let dragged = action.payload
-            state.value = state.value.map((media) => media.title == dragged?.title ? dragged : media)
+            let newList = state.value.map((media) => media.title == dragged?.title ? dragged : media)
+
+            localStorage.setItem(state.currentList, JSON.stringify(newList))
+            state.value = newList
+        },
+        setMedia: (state, action) => {
+            state.value = action.payload
         }
     }
 })
@@ -40,7 +49,7 @@ export const searchSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { editMedia } = mediaSlice.actions
+export const { editMedia, setMedia, setCurrentList } = mediaSlice.actions
 export const { setSort } = sortSlice.actions
 export const { setSearch } = searchSlice.actions
 

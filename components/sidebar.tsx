@@ -1,5 +1,8 @@
+import { AppDispatch } from "@/app/store";
+import { setMedia, setCurrentList } from "@/mediaSlice";
 import Image from "next/image"
-import { useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 export default function SideBar() {
 
@@ -9,8 +12,6 @@ export default function SideBar() {
         opacity: open ? "1" : 0,
         overflow: "hidden",
 
-
-        // optional width transition
         width: open ? "250px" : "0px",
         transition: "width ease-in-out .5s",
 
@@ -20,6 +21,13 @@ export default function SideBar() {
         width: open ? "250px" : "72px",
         transition: "width ease-in-out .5s",
     }
+
+    const [lists, setLists] = useState([]);
+
+    useEffect( () => {
+        // get lists from local storage
+        setLists(JSON.parse(localStorage.getItem("lists") ?? "[]"))
+    }, [])
 
 
 
@@ -34,11 +42,31 @@ export default function SideBar() {
             />
 
             <ul className="flex flex-col px-2 box-border gap-2" style={sideBarContentStyle}>
-                <li className=" hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md border px-2">Media 1</li>
-                <li className=" hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md border px-2">Media 2</li>
-                <li className=" hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md border px-2">Media 3</li>
+                {
+                    lists.map((list: string) => 
+                        <MediaList key={list} listName={list}></MediaList>
+                    )
+                }
             </ul>
 
         </div>
     );
 }
+
+const MediaList = memo(function({listName} : {listName: string}) {
+
+    const dispatch: AppDispatch = useDispatch()
+
+    const setList = useCallback( () => {
+        dispatch(setMedia(JSON.parse(localStorage.getItem(listName) ?? "")))
+        dispatch(setCurrentList(listName))
+
+        //TODO: dynamic route and handle stack pop MAYBE
+        // window.history.pushState({}, '', `/${listName}`);
+    },
+    [])
+
+    return (
+        <li onClick={setList} className="hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md border px-2">{listName}</li>
+    )
+})

@@ -19,7 +19,7 @@ interface MediaMap {
 export default function DragView() {
 
     const CategoryInfo: MediaMap = {
-        "Unstarted": {
+        "Pending": {
             hoverColor: "rgb(128 128 128 / .1)",
             ref: useRef<VListHandle>(null)
         },
