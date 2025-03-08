@@ -11,9 +11,9 @@ import { MEDIA_LISTS } from '@/data';
 
 
 
-export const CompletionLevelColumn = memo(function CompletionLevelColumn({ children, completionLevel, hoverColor, onFilter }: 
+export const CompletionLevelColumn = memo(function CompletionLevelColumn({ children, completionLevel, hoverColor }: 
     {
-        children?: React.ReactNode, completionLevel: CompletionLevel, hoverColor: string, onFilter: (lvl: CompletionLevel) => CompletionLevel | null,
+        children?: React.ReactNode, completionLevel: CompletionLevel, hoverColor: string,
 }) {
 
 
@@ -42,7 +42,7 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ child
         <div id={completionLevel} ref={setNodeRef} style={categoryStyle} className="flex flex-1 flex-col p-2 rounded-xl overflow-x-hidden min-w-56">
             
             <span onClick={ () => {
-                setGridView(onFilter(completionLevel as CompletionLevel) != null) // call filter function and use value to set column view
+                // setGridView(onFilter(completionLevel as CompletionLevel) != null) // call filter function and use value to set column view
             }} 
                 className="border rounded-lg w-fit px-5 hover:cursor-pointer bg-white mb-3 select-none"
             >{completionLevel}</span>
@@ -60,11 +60,8 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ child
                 :
                 // TODO: see if height changes performance
                     <div className='no-scrollbar h-full overflow-y-scroll flex flex-col'>
-                        <VList
-                            // ref={CategoryInfo[completionLevel].ref}
-                            className="no-scrollbar h-full overflow-y-scroll flex flex-col" >
-                            <VItems completionLevel={completionLevel}></VItems>
-                        </VList>
+                        
+                        <VItems completionLevel={completionLevel}></VItems>
 
                 </div>
                     
@@ -111,6 +108,7 @@ const VItems = memo(function VItems({completionLevel}: {completionLevel: Complet
         }
         // return formattedMedia
     }
+
 
     return (
         <VList
