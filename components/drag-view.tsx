@@ -39,7 +39,7 @@ export default function DragView() {
     
     const [filter, setFilter] = useState<CompletionLevel | null>(null)
 
-    const dispatch: AppDispatch = useDispatch()
+    // const dispatch: AppDispatch = useDispatch()
 
 
     const sensors = useSensors(
@@ -54,7 +54,7 @@ export default function DragView() {
         
         let newCompletionLevel = event.over?.id as CompletionLevel
         let dragged = { ...event.active.data.current, completionLevel: newCompletionLevel } as Media
-        dispatch(editMedia(dragged))
+        // dispatch(editMedia(dragged))
         // CategoryInfo[newCompletionLevel].ref.current?.scrollToIndex(formatMedia(newCompletionLevel).indexOf(dragged))
 
     }

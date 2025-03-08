@@ -5,7 +5,7 @@ import { Media, MediaSort } from './app/home';
 export const mediaSlice = createSlice({
     name: 'media',
     initialState: {
-        value: MEDIA_LISTS[0].media.filter(media => media.completionLevel == "Unstarted")
+        value: MEDIA_LISTS[0].media
     },
     reducers: {
         editMedia: (state, action) => {
