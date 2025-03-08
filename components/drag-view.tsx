@@ -50,9 +50,7 @@ export default function DragView() {
 
     const dispatch: AppDispatch = useDispatch()
 
-    const onDragEnd = useCallback((event: DragEndEvent) => {
-        console.log("end");
-        
+    const onDragEnd = useCallback((event: DragEndEvent) => {       
         let newCompletionLevel = event.over?.id as CompletionLevel
         let dragged = { ...event.active.data.current, completionLevel: newCompletionLevel } as Media
         dispatch(editMedia(dragged))
@@ -61,42 +59,6 @@ export default function DragView() {
     }
     , [])
 
-    const onDragOver = useCallback((event: DragOverEvent) => {
-
-        }
-    , [])
-
-
-    const onDragStart = useCallback((event: DragStartEvent) => {
-        // const title = event.active.id
-        // setActiveMedia(mediaList.find(m => m.title == title)!.title)
-    }
-    , [])
-
-
-    const onFilter = useCallback(
-        (completionLevel: CompletionLevel) => {
-            const newFilter: CompletionLevel | null = filter ? null : completionLevel as CompletionLevel
-
-            setFilter(newFilter as CompletionLevel)
-            return newFilter
-        }
-    , [filter])
-
-    const Columns = memo(() => {
-        return (<>
-            {COMPLETION_LEVELS.map(completionLevel => ((filter == null || filter == completionLevel) &&
-                <CompletionLevelColumn
-                    onFilter={onFilter}
-                    completionLevel={completionLevel} key={completionLevel} hoverColor={CategoryInfo[completionLevel].hoverColor}
-                >
-
-                </CompletionLevelColumn>
-            ))}
-        </>)
-    })
-
-
     return ( <>
 
         <DndContext
@@ -104,9 +66,21 @@ export default function DragView() {
             // collisionDetection={closestCenter}
             onDragEnd={onDragEnd}
         >
-            <Columns></Columns>
+            <Columns CategoryInfo={CategoryInfo}></Columns>
 
         </DndContext>
 
     </>)
 }
+
+const Columns = memo(({ CategoryInfo }: { CategoryInfo: MediaMap }) => {
+    return (<>
+        {COMPLETION_LEVELS.map(completionLevel =>
+            <CompletionLevelColumn
+                completionLevel={completionLevel} key={completionLevel} hoverColor={CategoryInfo[completionLevel].hoverColor}
+            >
+
+            </CompletionLevelColumn>
+        )}
+    </>)
+})

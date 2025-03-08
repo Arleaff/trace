@@ -10,7 +10,7 @@ import { Portal, Avatar } from 'radix-ui';
 
 
 
-export const MediaCard = memo(function MediaCard({ media, onEdit = () => { }, onDelete = () => { } }: 
+export const MediaCard = memo(function MediaCard({ media }: 
     { 
         media: Media,
         onEdit?: (newMedia: Media, originalMedia: Media | undefined) => any, onDelete?: (originalMedia: Media | undefined) => any
@@ -36,27 +36,6 @@ export const MediaCard = memo(function MediaCard({ media, onEdit = () => { }, on
 
     // const fallback = getTitleLetters(media.title)
 
-
-    const CardChildren = memo(() => {
-        return (<>
-            <Avatar.Root className="inline-flex size-[45px] select-none items-center justify-center overflow-hidden rounded-lg  align-middle">
-                <Avatar.Fallback className="leading-1 flex size-full items-center justify-center text-[15px] font-medium bg-[#0058FF20] text-[#002AB3C9]">
-                    {fallback}
-                </Avatar.Fallback>
-            </Avatar.Root>
-
-            <div className='ml-4 flex flex-col flex-1'>
-                <span className="line-clamp-2 text-start">{media.title}</span>
-                <div className='flex items-center'>
-                    <Progress value={progressValue} size="1" color={getColor} />
-                    <span className=' ml-2 text-gray-500'>{media.rating ?? "N/A"}</span>
-
-                </div>
-            </div>
-        </>)
-    })
-
-
     const getColor = getProgressColor(media.rating ?? 0)
     const progressValue = (media.rating ?? 0) * 10
     const fallback = getTitleLetters(media.title)
@@ -77,23 +56,23 @@ export const MediaCard = memo(function MediaCard({ media, onEdit = () => { }, on
                             aria-describedby=''
                             className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
                         >
-                        <CardChildren />
+                        <CardChildren fallback={fallback} media={media} progressValue={progressValue} getColor={getColor} />
 
                         </div>
                     </Portal.Root>
                 </Theme>
 
         :
-                    <div
-                        ref={setNodeRef}
-                        style={style}
-                        {...listeners}
-                        {...attributes}
-                        aria-describedby=''
-                        className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
-                    >
-                        <CardChildren />
-                    </div>
+            <div
+                ref={setNodeRef}
+                style={style}
+                    {...listeners}
+                    {...attributes}
+                aria-describedby=''
+                className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
+            >
+            <CardChildren fallback={fallback} media={media} progressValue={progressValue} getColor={getColor} />
+            </div>
         }
 
         </>
@@ -103,6 +82,26 @@ export const MediaCard = memo(function MediaCard({ media, onEdit = () => { }, on
     )
 })
 
+const CardChildren = memo(({ fallback, media, progressValue, getColor }: {
+    fallback: string, media: Media, progressValue: number, getColor: "ruby" | "amber" | "iris" | "jade"
+}) => {
+    return (<>
+        <Avatar.Root className="inline-flex size-[45px] select-none items-center justify-center overflow-hidden rounded-lg  align-middle">
+            <Avatar.Fallback className="leading-1 flex size-full items-center justify-center text-[15px] font-medium bg-[#0058FF20] text-[#002AB3C9]">
+                {fallback}
+            </Avatar.Fallback>
+        </Avatar.Root>
+
+        <div className='ml-4 flex flex-col flex-1'>
+            <span className="line-clamp-2 text-start">{media.title}</span>
+            <div className='flex items-center'>
+                <Progress value={progressValue} size="1" color={getColor} />
+                <span className=' ml-2 text-gray-500'>{media.rating ?? "N/A"}</span>
+
+            </div>
+        </div>
+    </>)
+})
 
 
 function getProgressColor(rating: number) {
