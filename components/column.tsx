@@ -11,45 +11,11 @@ import { MEDIA_LISTS } from '@/data';
 
 
 
-export const CompletionLevelColumn = memo(function CompletionLevelColumn({ children, completionLevel, hoverColor, onFilter, onEdit, onDelete }: 
+export const CompletionLevelColumn = memo(function CompletionLevelColumn({ children, completionLevel, hoverColor, onFilter }: 
     {
-        children?: React.ReactNode, completionLevel: string, hoverColor: string, onFilter: (lvl: CompletionLevel) => CompletionLevel | null,
-        onEdit: (newMedia: Media, originalMedia: Media | undefined) => any, onDelete: (originalMedia: Media | undefined) => any
+        children?: React.ReactNode, completionLevel: CompletionLevel, hoverColor: string, onFilter: (lvl: CompletionLevel) => CompletionLevel | null,
 }) {
 
-    const media = useSelector((state: RootState) => state.media.value)
-
-    const sort = useSelector((state: RootState) => state.sort.value)
-    const search = useSelector((state: RootState) => state.search.value)
-    const dispatch: AppDispatch = useDispatch()
-
-    const formatMedia = function formatMedia() {
-        let formattedMedia: Media[] = MEDIA_LISTS[0].media.filter(media => media.completionLevel == completionLevel)
-
-        if (search.trim().length != 0) {
-            formattedMedia = formattedMedia.filter(media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
-        }
-
-        switch (sort) {
-
-            case 'alphabetical':
-                return formattedMedia.sort((a, b) => a.title.localeCompare(b.title))
-            default:
-            case "highest_rating":
-                return formattedMedia.sort((a, b) => {
-                    // nulls sort after anything else
-                    if (a.rating === null) {
-                        return 1;
-                    }
-                    if (b.rating === null) {
-                        return -1;
-                    }
-
-                    return b.rating - a.rating
-                })
-        }
-        // return formattedMedia
-    }
 
     const [ gridView, setGridView ] = useState(false)
 
@@ -93,16 +59,13 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ child
                     </div>
                 :
                 // TODO: see if height changes performance
-                    <div className='no-scrollbar h-full overflow-y-scroll flex flex-col'
->
-                        <VList 
+                    <div className='no-scrollbar h-full overflow-y-scroll flex flex-col'>
+                        <VList
                             // ref={CategoryInfo[completionLevel].ref}
                             className="no-scrollbar h-full overflow-y-scroll flex flex-col" >
-                            {formatMedia().map((media) =>
-                                <MediaCard media={media} key={media.title}
-                                    onEdit={onEdit} onDelete={onDelete} />
-                            )}
+                            <VItems completionLevel={completionLevel}></VItems>
                         </VList>
+
                 </div>
                     
 
@@ -112,4 +75,51 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ child
             
         </div>
     );
+})
+
+
+const VItems = memo(function VItems({completionLevel}: {completionLevel: CompletionLevel}) {
+
+    const media = useSelector((state: RootState) => state.media.value)
+    const sort = useSelector((state: RootState) => state.sort.value)
+    const search = useSelector((state: RootState) => state.search.value)
+
+    const formatMedia = function formatMedia() {
+        let formattedMedia: Media[] = media.filter(media => media.completionLevel == completionLevel)
+
+        if (search.trim().length != 0) {
+            formattedMedia = formattedMedia.filter(media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
+        }
+
+        switch (sort) {
+
+            case 'alphabetical':
+                return formattedMedia.sort((a, b) => a.title.localeCompare(b.title))
+            default:
+            case "highest_rating":
+                return formattedMedia.sort((a, b) => {
+                    // nulls sort after anything else
+                    if (a.rating === null) {
+                        return 1;
+                    }
+                    if (b.rating === null) {
+                        return -1;
+                    }
+
+                    return b.rating - a.rating
+                })
+        }
+        // return formattedMedia
+    }
+
+    return (
+        <VList
+            // ref={CategoryInfo[completionLevel].ref}
+            className="no-scrollbar h-full overflow-y-scroll flex flex-col" >
+            {formatMedia().map((media) =>
+                <MediaCard media={media} key={media.title}
+                />
+            )}
+        </VList>
+    )
 })

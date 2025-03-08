@@ -4,7 +4,7 @@ import { CompletionLevelColumn } from "@/components/column";
 import { editMedia } from "@/mediaSlice";
 
 import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { memo, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { VList, VListHandle } from "virtua";
 
@@ -48,13 +48,14 @@ export default function DragView() {
         }),
     );
 
+    const dispatch: AppDispatch = useDispatch()
 
     const onDragEnd = useCallback((event: DragEndEvent) => {
         console.log("end");
         
         let newCompletionLevel = event.over?.id as CompletionLevel
         let dragged = { ...event.active.data.current, completionLevel: newCompletionLevel } as Media
-        // dispatch(editMedia(dragged))
+        dispatch(editMedia(dragged))
         // CategoryInfo[newCompletionLevel].ref.current?.scrollToIndex(formatMedia(newCompletionLevel).indexOf(dragged))
 
     }
@@ -72,13 +73,6 @@ export default function DragView() {
     }
     , [])
 
-    const onEdit = useCallback( (updatedMedia: Media, originalMedia: Media | undefined) => {
-        // setMediaList((oldList) => oldList.map((oldMedia) => oldMedia.title == originalMedia?.title ? updatedMedia : oldMedia));
-    }, [])
-
-    const onDelete = useCallback( (originalMedia: Media | undefined) => {
-        // setMediaList((oldList) => oldList.filter((oldMedia) => oldMedia.title != originalMedia?.title))
-    }, [])
 
     const onFilter = useCallback(
         (completionLevel: CompletionLevel) => {
@@ -89,6 +83,20 @@ export default function DragView() {
         }
     , [filter])
 
+    const Columns = memo(() => {
+        return (<>
+            {COMPLETION_LEVELS.map(completionLevel => ((filter == null || filter == completionLevel) &&
+                <CompletionLevelColumn
+                    onFilter={onFilter}
+                    completionLevel={completionLevel} key={completionLevel} hoverColor={CategoryInfo[completionLevel].hoverColor}
+                >
+
+                </CompletionLevelColumn>
+            ))}
+        </>)
+    })
+
+
     return ( <>
 
         <DndContext
@@ -96,17 +104,7 @@ export default function DragView() {
             // collisionDetection={closestCenter}
             onDragEnd={onDragEnd}
         >
-                { COMPLETION_LEVELS.map(completionLevel => ((filter == null || filter == completionLevel) &&                
-                    <CompletionLevelColumn
-                    onFilter={onFilter}
-                    completionLevel={completionLevel} key={completionLevel} hoverColor={CategoryInfo[completionLevel].hoverColor}
-                    // mediaList={formatMedia(completionLevel)}
-                    onDelete={onDelete}
-                    onEdit={onEdit} 
-                    >
-                        
-                    </CompletionLevelColumn>
-                ))}
+            <Columns></Columns>
 
         </DndContext>
 
