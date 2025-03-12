@@ -72,9 +72,9 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ child
 
 const VItems = memo(function VItems({completionLevel}: {completionLevel: CompletionLevel}) {
 
-    const media = useSelector((state: RootState) => state.media.value)
-    const sort = useSelector((state: RootState) => state.sort.value)
-    const search = useSelector((state: RootState) => state.search.value)
+    const media = useSelector((state: RootState) => state.media.currentMedia)
+    const sort = useSelector((state: RootState) => state.media.sort)
+    const search = useSelector((state: RootState) => state.media.search)
 
     const formatMedia = function formatMedia() {
         let formattedMedia: Media[] = media.filter(media => media.completionLevel == completionLevel)

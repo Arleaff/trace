@@ -1,59 +1,60 @@
 import { createSlice, current } from '@reduxjs/toolkit'
-import { Media, MediaSort } from './app/home';
+import { CompletionLevel, Media, MediaSort } from './app/home';
 
 export const mediaSlice = createSlice({
     name: 'media',
     initialState: {
-        value: [] as Media[],
-        currentList: ""
+        currentMedia: [] as Media[],
+        currentList: "",
+        sort: "highest_rating" as MediaSort,
+        search: "",
+        filter: null as CompletionLevel | null
     },
     reducers: {
         setCurrentList: (state, action) => {
             state.currentList = action.payload
         },
-        editMedia: (state, action) => {
-            let dragged = action.payload
-            let newList = state.value.map((media) => media.title == dragged?.title ? dragged : media)
+        replaceMedia: (state, action) => {
+            let original = action.payload[0]
+            let edited = action.payload[1]
+            let newList = state.currentMedia.map((media) => media.title == original?.title ? edited : media)
 
             localStorage.setItem(state.currentList, JSON.stringify(newList))
-            state.value = newList
+            state.currentMedia = newList
         },
-        setMedia: (state, action) => {
-            state.value = action.payload
-        }
-    }
-})
+        initializeMedia: (state, action) => {
+            state.currentMedia = action.payload
+        },
+        deleteMedia: (state, action) => {
+            let newList = state.currentMedia.filter((media) => media.title != action.payload?.title)
 
-export const sortSlice = createSlice({
-    name: 'sort',
-    initialState: {
-        value: "highest_rating" as MediaSort
-    },
-    reducers: {
+            localStorage.setItem(state.currentList, JSON.stringify(newList))
+            state.currentMedia = newList
+        },
+        addMedia: (state, action) => {
+            let newList = [...state.currentMedia, action.payload]
+
+            localStorage.setItem(state.currentList, JSON.stringify(newList))
+            state.currentMedia = newList
+        },
+
+        
+
+
         setSort: (state, action) => {
-            state.value = action.payload
+            state.sort = action.payload
+        },
+
+        setSearch: (state, action) => {
+            state.search = action.payload
         }
     }
 })
 
-export const searchSlice = createSlice({
-    name: 'search',
-    initialState: {
-        value: ""
-    },
-    reducers: {
-        setSearch: (state, action) => {
-            state.value = action.payload
-        }
-    }
-})
+
 
 // Action creators are generated for each case reducer function
-export const { editMedia, setMedia, setCurrentList } = mediaSlice.actions
-export const { setSort } = sortSlice.actions
-export const { setSearch } = searchSlice.actions
+export const { replaceMedia, initializeMedia, setCurrentList, setSort, setSearch, deleteMedia, addMedia } = mediaSlice.actions
 
 
 export const mediaReducer = mediaSlice.reducer
-export const sortReducer = sortSlice.reducer
-export const searchReducer = searchSlice.reducer

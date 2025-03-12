@@ -4,24 +4,35 @@ import * as Select from "@radix-ui/react-select";
 import { Label } from "@radix-ui/react-label";
 
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/app/store";
+import { addMedia, deleteMedia, replaceMedia } from "@/mediaSlice";
 
 export default function MediaDialog(
-    { children, dialogTitle, description = undefined, confirmText = "Confirm", altText = "Cancel", onConfirm, onAlt = () =>{ }, media = undefined } 
-    : { children?: React.ReactNode, dialogTitle: string, description?: string, confirmText?: string, altText?: string, 
-            onConfirm: (newMedia: Media, originalMedia: Media | undefined) => any, onAlt?: (originalMedia: Media | undefined) => any, 
-            media?: Media
+    { children, media = undefined, type } 
+    : { children?: React.ReactNode, 
+            media?: Media, type: "edit" | "add"
     },) {
+
+    const dispatch: AppDispatch = useDispatch()
+
 
     const [ open, setOpen ] = useState(false)
 
-    const [category, setCategory] = useState(media?.completionLevel)
+    const [completionLevel, setCompletionLevel] = useState(media?.completionLevel)
 
     const formRef = useRef<HTMLFormElement>(null)
 
-    const onClickAlt = () => {
-        onAlt(media)
-    }
+    const title = type == "add" ? "Add New Media" : "Edit Media"
+    const altText = type == "add" ? "Cancel" : "Delete"
+    const confirmText = type == "add" ? "Add" : "Confirm"
+
+    const onClickAlt = useCallback(() => {
+        if (type == "edit") {
+            dispatch(deleteMedia(media))
+        }
+    }, [])
 
     return (
         <>
@@ -33,10 +44,10 @@ export default function MediaDialog(
                     <Dialog.Overlay className="fixed size-full inset-0 bg-gray-500 opacity-50" />
                     <Dialog.Content className=" fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
 
-                        <Dialog.Title className="m-0 text-[17px] font-medium text-mauve12">{dialogTitle}</Dialog.Title>
-                        { description && <Dialog.Description className="mb-5 mt-2.5 text-[15px] leading-normal">
+                        <Dialog.Title className="m-0 text-[17px] font-medium text-mauve12">{title}</Dialog.Title>
+                        {/* { description && <Dialog.Description className="mb-5 mt-2.5 text-[15px] leading-normal">
                             {description}
-                        </Dialog.Description>}
+                        </Dialog.Description>} */}
                         <form
                             ref={formRef}
                             onKeyDown={ (event) => {
@@ -48,10 +59,10 @@ export default function MediaDialog(
                             }
                             action={async formData => {                                
                                 const title = formData.get("title");
-                                const extra = formData.get("extra");
                                 const rating = formData.get("rating");
 
-                                await onConfirm( { title, rating, completionLevel: category, extra } as Media, media)
+                                type == "add" ? dispatch(addMedia({ title, rating, completionLevel } as Media)) : dispatch(replaceMedia([media, { title, rating, completionLevel } as Media]))
+
                                 setOpen(false)
                             }}
                         >
@@ -65,14 +76,6 @@ export default function MediaDialog(
                             />
 
                             <label className="w-[90px] text-right text-[15px] text-violet11" htmlFor="rating">Extra</label>
-                            <input
-                                className="inline-flex h-[35px] w-full flex-1 items-center justify-center rounded px-2.5 text-[15px] leading-none text-violet11 shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-                                id="extra"
-                                name="extra"
-                                autoComplete="off"
-                                defaultValue={media?.extra || undefined}
-                                placeholder="N/A"
-                            />
 
                             <label className="w-[90px] text-right text-[15px] text-violet11" htmlFor="rating">Rating</label>
                             <input 
@@ -90,7 +93,7 @@ export default function MediaDialog(
                                 Category
                                 <Select.Root
                                     onValueChange={(value) => {
-                                        setCategory(value as CompletionLevel)
+                                        setCompletionLevel(value as CompletionLevel)
                                     }}
                                     defaultValue={media?.completionLevel as string}
                                 >

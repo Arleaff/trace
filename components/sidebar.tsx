@@ -1,5 +1,5 @@
 import { AppDispatch } from "@/app/store";
-import { setMedia, setCurrentList } from "@/mediaSlice";
+import { initializeMedia, setCurrentList } from "@/mediaSlice";
 import Image from "next/image"
 import { memo, useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -58,8 +58,8 @@ const MediaList = memo(function({listName} : {listName: string}) {
     const dispatch: AppDispatch = useDispatch()
 
     const setList = useCallback( () => {
-        dispatch(setMedia(JSON.parse(localStorage.getItem(listName) ?? "")))
         dispatch(setCurrentList(listName))
+        dispatch(initializeMedia(JSON.parse(localStorage.getItem(listName) ?? "")))
 
         //TODO: dynamic route and handle stack pop MAYBE
         // window.history.pushState({}, '', `/${listName}`);

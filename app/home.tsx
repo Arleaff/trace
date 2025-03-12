@@ -20,8 +20,7 @@ import { setSearch, setSort } from "@/mediaSlice";
 
 export default function Home({username} : {username: string}) {
   
-  const sort = useSelector((state: RootState) => state.sort.value)
-  const search = useSelector((state: RootState) => state.search.value)
+  const sort = useSelector((state: RootState) => state.media.sort)
   const dispatch: AppDispatch = useDispatch()
 
   function customCoordinatesGetter(event: { code: any; }, args: any) {
@@ -80,10 +79,10 @@ export default function Home({username} : {username: string}) {
           </div>
           
           <Select.Root
-            value={sort} // can be commented out
             onValueChange={ (value) => {
               dispatch(setSort(value))
             }}
+            defaultValue={sort}
           >
             <Select.Trigger
               id="select"
@@ -93,7 +92,7 @@ export default function Home({username} : {username: string}) {
               <Select.Icon>
                 <CaretSortIcon />
               </Select.Icon>
-              <Select.Value placeholder="Sort" className="line-clamp-1 text-nowrap"/>
+              <Select.Value className="line-clamp-1 text-nowrap"/>
 
             </Select.Trigger>
             <Select.Portal>
@@ -123,10 +122,7 @@ export default function Home({username} : {username: string}) {
 
           <Toolbar.Separator className="w-px" />
 
-            <MediaDialog 
-                dialogTitle="Create new item"
-                altText='Cancel' 
-                onConfirm={ media => { }} 
+            <MediaDialog type="add"
               >
 
               <Toolbar.Button className="inline-flex items-center gap-1">
