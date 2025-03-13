@@ -1,11 +1,14 @@
 "use client";
 import { useDraggable } from '@dnd-kit/core';
 import MediaDialog from './media-dialog';
-import { Media } from '@/app/home';
+import { DialogOptions, Media } from '@/app/home';
 import { Progress, Theme } from '@radix-ui/themes';
 import { memo, useRef } from 'react';
 import { CSS } from '@dnd-kit/utilities';
 import { Portal, Avatar } from 'radix-ui';
+import { AppDispatch } from '@/app/store';
+import { useDispatch } from 'react-redux';
+import { setDialog } from '@/mediaSlice';
 
 
 
@@ -25,8 +28,7 @@ export const MediaCard = memo(function MediaCard({ media }:
         }
     });
 
-    // const { title, extra, completionLevel, rating } = activeMedia!
-
+    const dispatch: AppDispatch = useDispatch()
 
     const style: React.CSSProperties = {
         opacity: isDragging ? "0.5" : "1",
@@ -34,7 +36,6 @@ export const MediaCard = memo(function MediaCard({ media }:
         position: isDragging ? 'fixed' : "relative",
     };
 
-    // const fallback = getTitleLetters(media.title)
 
     const getColor = getProgressColor(media.rating ?? 0)
     const progressValue = (media.rating ?? 0) * 10
@@ -71,6 +72,9 @@ export const MediaCard = memo(function MediaCard({ media }:
                     {...attributes}
                 aria-describedby=''
                 className="flex flex-row items-center border-2 rounded-xl pl-3 pr-1 py-2 select-none max-w-sm shadow-sm hover:shadow-md bg-white w-full my-1"
+                onClick={ () => {
+                    dispatch(setDialog({type: "edit", media} as DialogOptions))
+                }}
             >
             <CardChildren fallback={fallback} media={media} progressValue={progressValue} getColor={getColor} />
             </div>

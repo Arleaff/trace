@@ -1,5 +1,5 @@
 import { createSlice, current } from '@reduxjs/toolkit'
-import { CompletionLevel, Media, MediaSort } from './app/home';
+import { CompletionLevel, DialogOptions, Media, MediaSort } from './app/home';
 
 export const mediaSlice = createSlice({
     name: 'media',
@@ -8,7 +8,8 @@ export const mediaSlice = createSlice({
         currentList: "",
         sort: "highest_rating" as MediaSort,
         search: "",
-        filter: null as CompletionLevel | null
+        filter: null as CompletionLevel | null,
+        dialog: null as DialogOptions | null
     },
     reducers: {
         setCurrentList: (state, action) => {
@@ -38,6 +39,10 @@ export const mediaSlice = createSlice({
             state.currentMedia = newList
         },
 
+        setDialog: (state, action) => {
+            state.dialog = action.payload
+        },
+
         
 
 
@@ -54,7 +59,7 @@ export const mediaSlice = createSlice({
 
 
 // Action creators are generated for each case reducer function
-export const { replaceMedia, initializeMedia, setCurrentList, setSort, setSearch, deleteMedia, addMedia } = mediaSlice.actions
+export const { replaceMedia, initializeMedia, setCurrentList, setSort, setSearch, deleteMedia, addMedia, setDialog } = mediaSlice.actions
 
 
 export const mediaReducer = mediaSlice.reducer

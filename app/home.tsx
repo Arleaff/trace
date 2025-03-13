@@ -14,13 +14,14 @@ import { Avatar } from "@radix-ui/themes";
 import DragView from "@/components/drag-view";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "./store";
-import { setSearch, setSort } from "@/mediaSlice";
+import { setDialog, setSearch, setSort } from "@/mediaSlice";
 
 
 
 export default function Home({username} : {username: string}) {
   
   const sort = useSelector((state: RootState) => state.media.sort)
+  const dialog = useSelector((state: RootState) => state.media.dialog)
   const dispatch: AppDispatch = useDispatch()
 
   function customCoordinatesGetter(event: { code: any; }, args: any) {
@@ -61,9 +62,12 @@ export default function Home({username} : {username: string}) {
   return (
     // find alternative to overflow hidden
     <div className="flex flex-row h-dvh min-w-0 overflow-hidden">
-      <SideBar>
 
-      </SideBar>
+      {
+        dialog && <MediaDialog></MediaDialog>
+      }
+
+      <SideBar/>
       
       <div className="min-w-fit h-full flex flex-col flex-1">
         
@@ -122,13 +126,9 @@ export default function Home({username} : {username: string}) {
 
           <Toolbar.Separator className="w-px" />
 
-            <MediaDialog type="add"
-              >
-
-              <Toolbar.Button className="inline-flex items-center gap-1">
-                New Item
-              </Toolbar.Button>
-            </MediaDialog>
+            <Toolbar.Button className="inline-flex items-center gap-1" onClick={ () => dispatch(setDialog({type: "add", media: undefined} as DialogOptions))}>
+              New Item
+            </Toolbar.Button>
 
           <Avatar fallback={getTitleLetters(username)} radius={"full"} className=" fixed top-0 right-0 m-2" />
 
@@ -160,5 +160,7 @@ export type Media = {
   completionLevel: CompletionLevel;
 }
 
-
-
+export type DialogOptions = {
+  media: Media | undefined,
+  type: "edit" | "add"
+}

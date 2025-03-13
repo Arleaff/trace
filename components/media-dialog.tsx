@@ -5,41 +5,33 @@ import { Label } from "@radix-ui/react-label";
 
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useCallback, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/app/store";
-import { addMedia, deleteMedia, replaceMedia } from "@/mediaSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/app/store";
+import { addMedia, deleteMedia, replaceMedia, setDialog } from "@/mediaSlice";
 
-export default function MediaDialog(
-    { children, media = undefined, type } 
-    : { children?: React.ReactNode, 
-            media?: Media, type: "edit" | "add"
-    },) {
+export default function MediaDialog() {
 
+    const dialog = useSelector((state: RootState) => state.media.dialog)
     const dispatch: AppDispatch = useDispatch()
 
 
-    const [ open, setOpen ] = useState(false)
-
-    const [completionLevel, setCompletionLevel] = useState(media?.completionLevel)
+    const [completionLevel, setCompletionLevel] = useState(dialog?.media?.completionLevel)
 
     const formRef = useRef<HTMLFormElement>(null)
 
-    const title = type == "add" ? "Add New Media" : "Edit Media"
-    const altText = type == "add" ? "Cancel" : "Delete"
-    const confirmText = type == "add" ? "Add" : "Confirm"
+    const title = dialog?.type == "add" ? "Add New Media" : "Edit Media"
+    const altText = dialog?.type == "add" ? "Cancel" : "Delete"
+    const confirmText = dialog?.type == "add" ? "Add" : "Confirm"
 
     const onClickAlt = useCallback(() => {
-        if (type == "edit") {
-            dispatch(deleteMedia(media))
+        if (dialog?.type == "edit") {
+            dispatch(deleteMedia(dialog?.media))
         }
     }, [])
 
     return (
         <>
-            <Dialog.Root open={open} onOpenChange={setOpen}>
-                <Dialog.Trigger asChild>
-                    {children}
-                </Dialog.Trigger>
+            <Dialog.Root open={dialog != null} onOpenChange={() => dispatch(setDialog(null))}>
                 <Dialog.Portal>
                     <Dialog.Overlay className="fixed size-full inset-0 bg-gray-500 opacity-50" />
                     <Dialog.Content className=" fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
@@ -61,9 +53,9 @@ export default function MediaDialog(
                                 const title = formData.get("title");
                                 const rating = formData.get("rating");
 
-                                type == "add" ? dispatch(addMedia({ title, rating, completionLevel } as Media)) : dispatch(replaceMedia([media, { title, rating, completionLevel } as Media]))
+                                dialog?.type == "add" ? dispatch(addMedia({ title, rating, completionLevel } as Media)) : dispatch(replaceMedia([dialog?.media, { title, rating, completionLevel } as Media]))
 
-                                setOpen(false)
+                                dispatch(setDialog(null))
                             }}
                         >
                             <label className="w-[90px] text-right text-[15px]" htmlFor="title">Title</label>
@@ -72,10 +64,8 @@ export default function MediaDialog(
                                 id="title"
                                 name="title"
                                 autoComplete="off"
-                                defaultValue={media?.title}
+                                defaultValue={dialog?.media?.title}
                             />
-
-                            <label className="w-[90px] text-right text-[15px] text-violet11" htmlFor="rating">Extra</label>
 
                             <label className="w-[90px] text-right text-[15px] text-violet11" htmlFor="rating">Rating</label>
                             <input 
@@ -83,7 +73,7 @@ export default function MediaDialog(
                                 id="rating" 
                                 name="rating"
                                 autoComplete="off"
-                                defaultValue={media?.rating || undefined}
+                                defaultValue={dialog?.media?.rating || undefined}
                                 placeholder="N/A"
                             />
 
@@ -95,7 +85,7 @@ export default function MediaDialog(
                                     onValueChange={(value) => {
                                         setCompletionLevel(value as CompletionLevel)
                                     }}
-                                    defaultValue={media?.completionLevel as string}
+                                    defaultValue={dialog?.media?.completionLevel as string}
                                 >
                                     <Select.Trigger
                                         id="select"
