@@ -1,6 +1,16 @@
 import { createSlice, current } from '@reduxjs/toolkit'
 import { CompletionLevel, DialogOptions, Media, MediaSort } from './app/home';
 
+/*
+
+localStorage is used to store an array of all lists (key: "lists")
+localStorage is also used to store an array of media for each of these lists (key: name of list, each key being a value of the array above )
+
+localStorage.getItem("lists") -> ["Games", "Movies"]
+localStorage.getItem("Games") -> [ {"Minecraft", 10/10, Finished}, etc. ]
+
+*/
+
 export const mediaSlice = createSlice({
     name: 'media',
     initialState: {
@@ -39,12 +49,10 @@ export const mediaSlice = createSlice({
             state.currentMedia = newList
         },
 
+
         setDialog: (state, action) => {
             state.dialog = action.payload
         },
-
-        
-
 
         setSort: (state, action) => {
             state.sort = action.payload
