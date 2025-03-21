@@ -25,6 +25,7 @@ export const mediaSlice = createSlice({
         setCurrentList: (state, action) => {
             state.currentList = action.payload
         },
+
         replaceMedia: (state, action) => {
             let original = action.payload[0]
             let edited = action.payload[1]
@@ -33,7 +34,7 @@ export const mediaSlice = createSlice({
             localStorage.setItem(state.currentList, JSON.stringify(newList))
             state.currentMedia = newList
         },
-        initializeMedia: (state, action) => {
+        setMedia: (state, action) => {
             state.currentMedia = action.payload
         },
         deleteMedia: (state, action) => {
@@ -67,7 +68,7 @@ export const mediaSlice = createSlice({
 
 
 // Action creators are generated for each case reducer function
-export const { replaceMedia, initializeMedia, setCurrentList, setSort, setSearch, deleteMedia, addMedia, setDialog } = mediaSlice.actions
+export const { replaceMedia, setMedia, setCurrentList, setSort, setSearch, deleteMedia, addMedia, setDialog } = mediaSlice.actions
 
 
 export const mediaReducer = mediaSlice.reducer

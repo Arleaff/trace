@@ -11,10 +11,11 @@ import { Box, Button, Dialog, Flex, Select } from "@radix-ui/themes";
 export default function MediaDialog() {
 
     const dialog = useSelector((state: RootState) => state.media.dialog)
+    
     const dispatch: AppDispatch = useDispatch()
 
 
-    const [completionLevel, setCompletionLevel] = useState(dialog?.media?.completionLevel)
+    const [completionLevel, setCompletionLevel] = useState(dialog?.media?.completionLevel as string ?? "Pending")
 
     const formRef = useRef<HTMLFormElement>(null)
 
@@ -80,7 +81,7 @@ export default function MediaDialog() {
                                         onValueChange={(value) => {
                                             setCompletionLevel(value as CompletionLevel)
                                         }}
-                                        defaultValue={dialog?.media?.completionLevel as string ?? "Pending"}
+                                        value={completionLevel as string}
                                     >
                                         <Select.Trigger />
 

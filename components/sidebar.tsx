@@ -1,72 +1,16 @@
+import { Media } from "@/app/home";
 import { AppDispatch, RootState } from "@/app/store";
-import { initializeMedia, setCurrentList } from "@/mediaSlice";
-import { PlusIcon } from "@radix-ui/react-icons";
-import { Button, Dialog, Flex, TextField } from "@radix-ui/themes";
+import { setMedia, setCurrentList } from "@/mediaSlice";
+import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
+import { AlertDialog, Button, Dialog, Flex, TextField } from "@radix-ui/themes";
 import Image from "next/image"
 import { useSearchParams } from "next/navigation";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-
-function AddListDialog() {
-    
-    const [open, setOpen] = useState(false)
-    const dispatch: AppDispatch = useDispatch()
-
-
-    return (
-    
-    <Dialog.Root open={open} onOpenChange={setOpen}>
-        <Dialog.Trigger>
-            <Button>New List</Button>
-        </Dialog.Trigger>
-
-        <Dialog.Content maxWidth="450px">
-
-            <Dialog.Title>Add List</Dialog.Title>
-
-            <form action={ async formData => {                                
-                const newList = formData.get("name") as string;
-                const lists = JSON.parse(localStorage.getItem("lists") ?? "[]");
-                if (lists?.includes(newList)) {
-                    console.log("error");
-                }
-                else {
-                    localStorage.setItem("lists", JSON.stringify([...lists, newList]))
-                    dispatch(setCurrentList(newList))
-                    setOpen(false)
-
-                }
-                
-            }}>
-                <Flex direction="column" gap="3">
-                    <label htmlFor="name">
-                        <div className="mb-2 font-bold">
-                            List Name
-                        </div>
-                        
-                    </label>
-                    <TextField.Root id="name" name="name" defaultValue="Movies" placeholder="Enter list name" />
-                </Flex>
-
-                <Flex gap="3" mt="4" justify="end">
-                    <Dialog.Close>
-                        <Button variant="soft" color="gray">
-                            Cancel
-                        </Button>
-                    </Dialog.Close>
-                    <Button>Add</Button>
-
-                </Flex>
-            </form>
-            
-        </Dialog.Content>
-    </Dialog.Root>);
-}
-
-
 export default function SideBar() {
 
+    const currentList = useSelector((state: RootState) => state.media.currentList)
     const [open, setOpen] = useState(false);
 
     const sideBarContentStyle: React.CSSProperties = {
@@ -91,7 +35,7 @@ export default function SideBar() {
     useEffect( () => {
         // get lists from local storage
         setLists(JSON.parse(localStorage.getItem("lists") ?? "[]")) 
-    }, [])
+    }, [currentList])
 
     useEffect(() => {
 
@@ -102,11 +46,11 @@ export default function SideBar() {
 
         if (list == null) {
             dispatch(setCurrentList(""))
-            dispatch(initializeMedia([]))
+            dispatch(setMedia([]))
         }
         else {
             dispatch(setCurrentList(list))
-            dispatch(initializeMedia(JSON.parse(localStorage.getItem(list) ?? "[]")))
+            dispatch(setMedia(JSON.parse(localStorage.getItem(list) ?? "[]")))
         }
         
     }, [searchParams])
@@ -139,8 +83,71 @@ export default function SideBar() {
     );
 }
 
+function AddListDialog() {
+
+    const [open, setOpen] = useState(false)
+    const dispatch: AppDispatch = useDispatch()
+
+    const searchParams = useSearchParams()
+
+    return (
+
+        <Dialog.Root open={open} onOpenChange={setOpen}>
+            <Dialog.Trigger>
+                <Button>New List</Button>
+            </Dialog.Trigger>
+
+            <Dialog.Content maxWidth="450px">
+
+                <Dialog.Title>Add List</Dialog.Title>
+
+                <form action={async formData => {
+                    const newList = formData.get("name") as string;
+                    const lists = JSON.parse(localStorage.getItem("lists") ?? "[]");
+
+                    if (!lists?.includes(newList)) {
+                        localStorage.setItem("lists", JSON.stringify([...lists, newList]))
+                        dispatch(setCurrentList(newList))
+                        setOpen(false)
+
+                        const params = new URLSearchParams(searchParams.toString())
+                        params.set('list', newList)
+                        window.history.pushState({}, '', `?${params.toString()}`);
+
+                    }
+                    else {
+                        console.log("error");
+                    }
+
+                }}>
+                    <Flex direction="column" gap="3">
+                        <label htmlFor="name">
+                            <div className="mb-2 font-bold">
+                                List Name
+                            </div>
+
+                        </label>
+                        <TextField.Root id="name" name="name" defaultValue="Movies" placeholder="Enter list name" />
+                    </Flex>
+
+                    <Flex gap="3" mt="4" justify="end">
+                        <Dialog.Close>
+                            <Button variant="soft" color="gray">
+                                Cancel
+                            </Button>
+                        </Dialog.Close>
+                        <Button>Add</Button>
+
+                    </Flex>
+                </form>
+
+            </Dialog.Content>
+        </Dialog.Root>);
+}
+
 const MediaList = memo(function ({ listName }: { listName: string }) {
 
+    const currentList = useSelector((state: RootState) => state.media.currentList)
     const dispatch: AppDispatch = useDispatch()
 
     const searchParams = useSearchParams()
@@ -149,18 +156,65 @@ const MediaList = memo(function ({ listName }: { listName: string }) {
     const setList = useCallback(() => {
         dispatch(setCurrentList(listName))
 
-        dispatch(initializeMedia(JSON.parse(localStorage.getItem(listName) ?? "[]")))
+        dispatch(setMedia(JSON.parse(localStorage.getItem(listName) ?? "[]")))
 
         const params = new URLSearchParams(searchParams.toString())
         params.set('list', listName)
 
-         // TODO: catch error if list does not exist
-        //TODO: dynamic route and handle stack pop MAYBE
         window.history.pushState({}, '', `?${params.toString()}`);
-    },
-        [])
+    }, [])
+
+    const deleteList = useCallback( () =>{
+        localStorage.removeItem(currentList)
+
+        let oldLists = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
+        localStorage.setItem("lists", JSON.stringify(oldLists.filter( list => list != listName)) )
+        dispatch(setCurrentList(""))
+        dispatch(setMedia([]))
+
+        window.history.replaceState({}, '', "/");
+        
+
+    }, [])
 
     return (
-        <li onClick={setList} className="hover:bg-gray-400 hover:bg-opacity-50 cursor-pointer rounded-md border px-2">{listName}</li>
+        <>
+            <Flex className="hover:bg-gray-400 hover:bg-opacity-50 flex-1 cursor-pointer rounded-md border px-2" align={"center"}>
+                <li onClick={setList} className=" flex-1" >{listName}</li>
+                { currentList == listName && 
+                    <>
+                    <AlertDialog.Root>
+                        <AlertDialog.Trigger >
+                            <TrashIcon width={20} height={20} color="red" />
+                        </AlertDialog.Trigger>
+                        <AlertDialog.Content maxWidth="450px">
+                            <AlertDialog.Title>Delete list</AlertDialog.Title>
+                            <AlertDialog.Description size="2">
+                                Are you sure? <strong>This action cannot be undone.</strong>
+                            </AlertDialog.Description>
+
+                            <Flex gap="3" mt="4" justify="between">
+                                <AlertDialog.Cancel>
+                                    <Button variant="soft" color="gray">
+                                        Cancel
+                                    </Button>
+                                </AlertDialog.Cancel>
+                                <AlertDialog.Action>
+                                    <Button variant="solid" color="red" 
+                                    
+                                        // onClick={deleteList}
+                                    >
+                                        Delete
+                                    </Button>
+                                </AlertDialog.Action>
+                            </Flex>
+                        </AlertDialog.Content>
+                    </AlertDialog.Root>
+                        
+                    </>
+                }
+            </Flex>
+
+        </>
     )
 })
