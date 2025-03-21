@@ -1,20 +1,19 @@
 "use client"
 
-import { getTitleLetters, MediaCard } from "@/components/media-card";
+import { getTitleLetters } from "@/components/media-card";
 import SideBar from "@/components/sidebar";
-import { CaretSortIcon, MagnifyingGlassIcon, PlusCircledIcon } from "@radix-ui/react-icons";
+import { CaretSortIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import * as Select from "@radix-ui/react-select";
 
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { VListHandle } from "virtua";
 import MediaDialog from "@/components/media-dialog";
-import { getUserLists } from "@/db";
 import { Avatar } from "@radix-ui/themes";
 import DragView from "@/components/drag-view";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "./store";
 import { setDialog, setSearch, setSort } from "@/mediaSlice";
+
+
 
 
 

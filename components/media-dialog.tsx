@@ -1,5 +1,4 @@
 import { COMPLETION_LEVELS, CompletionLevel, Media } from "@/app/home";
-import * as Dialog from "@radix-ui/react-dialog";
 import * as Select from "@radix-ui/react-select";
 import { Label } from "@radix-ui/react-label";
 
@@ -8,6 +7,7 @@ import { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
 import { addMedia, deleteMedia, replaceMedia, setDialog } from "@/mediaSlice";
+import { Button, Dialog } from "@radix-ui/themes";
 
 export default function MediaDialog() {
 
@@ -32,14 +32,10 @@ export default function MediaDialog() {
     return (
         <>
             <Dialog.Root open={dialog != null} onOpenChange={() => dispatch(setDialog(null))}>
-                <Dialog.Portal>
-                    <Dialog.Overlay className="fixed size-full inset-0 bg-gray-500 opacity-50" />
-                    <Dialog.Content className=" fixed left-1/2 top-1/2 max-h-[85vh] w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none">
+                    <Dialog.Content>
 
-                        <Dialog.Title className="m-0 text-[17px] font-medium text-mauve12">{title}</Dialog.Title>
-                        {/* { description && <Dialog.Description className="mb-5 mt-2.5 text-[15px] leading-normal">
-                            {description}
-                        </Dialog.Description>} */}
+                        <Dialog.Title >{title}</Dialog.Title>
+
                         <form
                             ref={formRef}
                             onKeyDown={ (event) => {
@@ -123,22 +119,21 @@ export default function MediaDialog() {
                             </Label>
 
                             <div id="buttons" className="mt-[25px] flex justify-between">
-                                <Dialog.Close asChild>
-                                    <button onClick={onClickAlt}
-                                     type='submit' className="inline-flex h-[35px] items-center justify-center rounded bg-green4 px-[15px] font-medium leading-none text-green11 hover:bg-green5 focus:shadow-[0_0_0_2px] focus:shadow-green7 focus:outline-none">
+                                <Dialog.Close>
+                                    <Button className="radix-themes" onClick={onClickAlt} color={ dialog?.type == "edit" ? "ruby" : "gray"}>
                                         {altText}
-                                    </button>
+                                    </Button>
                                 </Dialog.Close>
 
-                                <button type='submit' className="inline-flex h-[35px] items-center justify-center rounded bg-green4 px-[15px] font-medium leading-none text-green11 hover:bg-green5 focus:shadow-[0_0_0_2px] focus:shadow-green7 focus:outline-none">
+                                <Button>
                                     {confirmText}
-                                </button>
+                                </Button>
                             </div>
                             
                         </form>
 
                         
-                        <Dialog.Close asChild>
+                        <Dialog.Close>
                             <button
                                 className="absolute right-2.5 top-2.5 inline-flex size-[25px] appearance-none items-center justify-center rounded-full text-violet11 hover:bg-violet4 focus:shadow-[0_0_0_2px focus:outline-none"
                                 aria-label="Close"
@@ -149,7 +144,6 @@ export default function MediaDialog() {
 
 
                     </Dialog.Content>
-                </Dialog.Portal>
             </Dialog.Root>
         </>
     );
