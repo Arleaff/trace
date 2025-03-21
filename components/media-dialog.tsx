@@ -1,5 +1,4 @@
 import { COMPLETION_LEVELS, CompletionLevel, Media } from "@/app/home";
-import * as Select from "@radix-ui/react-select";
 import { Label } from "@radix-ui/react-label";
 
 import { Cross2Icon } from '@radix-ui/react-icons';
@@ -7,7 +6,7 @@ import { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
 import { addMedia, deleteMedia, replaceMedia, setDialog } from "@/mediaSlice";
-import { Button, Dialog } from "@radix-ui/themes";
+import { Box, Button, Dialog, Flex, Select } from "@radix-ui/themes";
 
 export default function MediaDialog() {
 
@@ -73,50 +72,33 @@ export default function MediaDialog() {
                                 placeholder="N/A"
                             />
 
+                            <Box className="pt-3">
+                                <Flex align={"center"} gap={"2"}>
+                                    <Label>Category</Label>
 
-
-                            <Label>
-                                Category
-                                <Select.Root
-                                    onValueChange={(value) => {
-                                        setCompletionLevel(value as CompletionLevel)
-                                    }}
-                                    defaultValue={dialog?.media?.completionLevel as string}
-                                >
-                                    <Select.Trigger
-                                        id="select"
-                                        className="m-4 w-48 h-6 inline-flex flex-none items-center justify-center gap-[5px] rounded bg-white px-[15px] text-sm leading-none  shadow-black/10 outline-none focus:shadow-[0_0_0_2px]"
-                                        aria-label="Food"
-                                        name="category"
+                                    <Select.Root
+                                        onValueChange={(value) => {
+                                            setCompletionLevel(value as CompletionLevel)
+                                        }}
+                                        defaultValue={dialog?.media?.completionLevel as string ?? "Pending"}
                                     >
-                                        <Select.Value placeholder="Choose a category" className="line-clamp-1 text-nowrap"/>
+                                        <Select.Trigger />
 
-                                    </Select.Trigger>
-                                    <Select.Portal>
-                                        <Select.Content
-                                            position="popper"
-                                            className="overflow-hidden rounded-md bg-white "
-                                            style={{ width: "var(--radix-select-trigger-width)", maxHeight: "var(--radix-select-content-available-height)" }}
-                                        >
-
-                                            <Select.Viewport className="p-[5px]">
-
-                                                {
-                                                    COMPLETION_LEVELS.map((level) =>
-                                                        <Select.Item key={level} value={ level } className="data-[state=checked]:hidden line-clamp-1 px-2 text-sm text-center">
-                                                            <Select.ItemText>
-                                                                {level}
-                                                            </Select.ItemText>
-                                                        </Select.Item>
-                                                    )
-                                                }
-
-                                            </Select.Viewport>
+                                        <Select.Content position="item-aligned">
+                                            {
+                                                COMPLETION_LEVELS.map((level) =>
+                                                    <Select.Item key={level} value={level}>
+                                                        {level}
+                                                    </Select.Item>
+                                                )
+                                            }
 
                                         </Select.Content>
-                                    </Select.Portal>
-                                </Select.Root>
-                            </Label>
+                                    </Select.Root>
+                            </Flex>
+                                
+                            </Box>
+                            
 
                             <div id="buttons" className="mt-[25px] flex justify-between">
                                 <Dialog.Close>

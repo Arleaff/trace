@@ -126,7 +126,7 @@ export default function SideBar() {
 
 
             <ul className="flex flex-col px-2 box-border gap-2" style={sideBarContentStyle}>
-                <AddListDialog></AddListDialog>
+                <AddListDialog/>
 
                 {
                     lists.map((list: string) =>
