@@ -2,15 +2,14 @@
 
 import { getTitleLetters } from "@/components/media-card";
 import SideBar from "@/components/sidebar";
-import { CaretSortIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import * as Toolbar from "@radix-ui/react-toolbar";
 
 import MediaDialog from "@/components/media-dialog";
-import { Avatar, Box, Button, Flex, Grid, Select, TextField } from "@radix-ui/themes";
+import { Avatar, Box, Button, Flex, Select, TextField } from "@radix-ui/themes";
 import DragView from "@/components/drag-view";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "./store";
 import { setDialog, setSearch, setSort } from "@/mediaSlice";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
 
 
@@ -22,39 +21,6 @@ export default function Home({username} : {username: string}) {
   const dialog = useSelector((state: RootState) => state.media.dialog)
   const dispatch: AppDispatch = useDispatch()
 
-  function customCoordinatesGetter(event: { code: any; }, args: any) {
-
-    
-    const { currentCoordinates } = args;
-    
-
-    const delta = 50;
-
-    switch (event.code) {
-      case 'ArrowRight':
-        return {
-          ...currentCoordinates,
-          x: currentCoordinates.x + delta,
-        };
-      case 'ArrowLeft':
-        return {
-          ...currentCoordinates,
-          x: currentCoordinates.x - delta,
-        };
-      case 'ArrowDown':
-        return {
-          ...currentCoordinates,
-          y: currentCoordinates.y + delta,
-        };
-      case 'ArrowUp':
-        return {
-          ...currentCoordinates,
-          y: currentCoordinates.y - delta,
-        };
-    }
-
-    return undefined;
-  };
 
 
   return (

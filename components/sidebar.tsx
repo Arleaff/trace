@@ -149,7 +149,7 @@ function AddListDialog() {
         </Dialog.Root>);
 }
 
-const MediaList = memo(function ({ listName }: { listName: string }) {
+const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
 
     const currentList = useSelector((state: RootState) => state.media.currentList)
     const dispatch: AppDispatch = useDispatch()
@@ -170,7 +170,7 @@ const MediaList = memo(function ({ listName }: { listName: string }) {
     const deleteList = useCallback( () =>{
         localStorage.removeItem(currentList)
 
-        let oldLists = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
+        const oldLists = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
         localStorage.setItem("lists", JSON.stringify(oldLists.filter( list => list != listName)) )
         dispatch(setCurrentList(""))
         dispatch(setMedia([]))
