@@ -7,7 +7,6 @@ import { VList, VListHandle } from 'virtua';
 import { MediaCard } from './media-card';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/app/store';
-import { MEDIA_LISTS } from '@/data';
 
 
 
@@ -59,11 +58,7 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ child
                     </div>
                 :
                 // TODO: see if height changes performance
-                    <div className='no-scrollbar h-full overflow-y-scroll flex flex-col'>
-                        
-                        <VItems completionLevel={completionLevel}></VItems>
-
-                </div>
+                    <VItems completionLevel={completionLevel}></VItems>
                     
 
             }
@@ -77,9 +72,9 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ child
 
 const VItems = memo(function VItems({completionLevel}: {completionLevel: CompletionLevel}) {
 
-    const media = useSelector((state: RootState) => state.media.value)
-    const sort = useSelector((state: RootState) => state.sort.value)
-    const search = useSelector((state: RootState) => state.search.value)
+    const media = useSelector((state: RootState) => state.media.currentMedia)
+    const sort = useSelector((state: RootState) => state.media.sort)
+    const search = useSelector((state: RootState) => state.media.search)
 
     const formatMedia = function formatMedia() {
         let formattedMedia: Media[] = media.filter(media => media.completionLevel == completionLevel)

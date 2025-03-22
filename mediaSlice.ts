@@ -1,50 +1,74 @@
-import { createSlice } from '@reduxjs/toolkit'
-import { MEDIA_LISTS } from "@/data";
-import { Media, MediaSort } from './app/home';
+import { createSlice, current } from '@reduxjs/toolkit'
+import { CompletionLevel, DialogOptions, Media, MediaSort } from './app/home';
+
+/*
+
+localStorage is used to store an array of all lists (key: "lists")
+localStorage is also used to store an array of media for each of these lists (key: name of list, each key being a value of the array above )
+
+localStorage.getItem("lists") -> ["Games", "Movies"]
+localStorage.getItem("Games") -> [ {"Minecraft", 10/10, Finished}, etc. ]
+
+*/
 
 export const mediaSlice = createSlice({
     name: 'media',
     initialState: {
-        value: MEDIA_LISTS[0].media
+        currentMedia: [] as Media[],
+        currentList: "",
+        sort: "highest_rating" as MediaSort,
+        search: "",
+        filter: null as CompletionLevel | null,
+        dialog: null as DialogOptions | null
     },
     reducers: {
-        editMedia: (state, action) => {
-            let dragged = action.payload
-            state.value = state.value.map((media) => media.title == dragged?.title ? dragged : media)
-        }
-    }
-})
+        setCurrentList: (state, action) => {
+            state.currentList = action.payload
+        },
 
-export const sortSlice = createSlice({
-    name: 'sort',
-    initialState: {
-        value: "highest_rating" as MediaSort
-    },
-    reducers: {
+        replaceMedia: (state, action) => {
+            let original = action.payload[0]
+            let edited = action.payload[1]
+            let newList = state.currentMedia.map((media) => media.title == original?.title ? edited : media)
+
+            localStorage.setItem(state.currentList, JSON.stringify(newList))
+            state.currentMedia = newList
+        },
+        setMedia: (state, action) => {
+            state.currentMedia = action.payload
+        },
+        deleteMedia: (state, action) => {
+            let newList = state.currentMedia.filter((media) => media.title != action.payload?.title)
+
+            localStorage.setItem(state.currentList, JSON.stringify(newList))
+            state.currentMedia = newList
+        },
+        addMedia: (state, action) => {
+            let newList = [...state.currentMedia, action.payload]
+
+            localStorage.setItem(state.currentList, JSON.stringify(newList))
+            state.currentMedia = newList
+        },
+
+
+        setDialog: (state, action) => {
+            state.dialog = action.payload
+        },
+
         setSort: (state, action) => {
-            state.value = action.payload
+            state.sort = action.payload
+        },
+
+        setSearch: (state, action) => {
+            state.search = action.payload
         }
     }
 })
 
-export const searchSlice = createSlice({
-    name: 'search',
-    initialState: {
-        value: ""
-    },
-    reducers: {
-        setSearch: (state, action) => {
-            state.value = action.payload
-        }
-    }
-})
+
 
 // Action creators are generated for each case reducer function
-export const { editMedia } = mediaSlice.actions
-export const { setSort } = sortSlice.actions
-export const { setSearch } = searchSlice.actions
+export const { replaceMedia, setMedia, setCurrentList, setSort, setSearch, deleteMedia, addMedia, setDialog } = mediaSlice.actions
 
 
 export const mediaReducer = mediaSlice.reducer
-export const sortReducer = sortSlice.reducer
-export const searchReducer = searchSlice.reducer

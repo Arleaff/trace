@@ -1,12 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { mediaReducer, searchReducer, sortReducer } from '@/mediaSlice'
+import { mediaReducer } from '@/mediaSlice'
 
 
 export const store =  configureStore({
     reducer: {
         media: mediaReducer,
-        search: searchReducer,
-        sort: sortReducer
     }
 })
 

@@ -1,9 +1,9 @@
 import { COMPLETION_LEVELS, CompletionLevel, Media, MediaSort } from "@/app/home";
 import { AppDispatch, RootState } from "@/app/store";
 import { CompletionLevelColumn } from "@/components/column";
-import { editMedia } from "@/mediaSlice";
+import { replaceMedia } from "@/mediaSlice";
 
-import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, DragOverEvent, DragStartEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { memo, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { VList, VListHandle } from "virtua";
@@ -19,7 +19,7 @@ interface MediaMap {
 export default function DragView() {
 
     const CategoryInfo: MediaMap = {
-        "Unstarted": {
+        "Pending": {
             hoverColor: "rgb(128 128 128 / .1)",
             ref: useRef<VListHandle>(null)
         },
@@ -52,10 +52,9 @@ export default function DragView() {
 
     const onDragEnd = useCallback((event: DragEndEvent) => {       
         let newCompletionLevel = event.over?.id as CompletionLevel
+        let original = event.active.data.current as Media
         let dragged = { ...event.active.data.current, completionLevel: newCompletionLevel } as Media
-        dispatch(editMedia(dragged))
-        // CategoryInfo[newCompletionLevel].ref.current?.scrollToIndex(formatMedia(newCompletionLevel).indexOf(dragged))
-
+        dispatch(replaceMedia([original, dragged]))
     }
     , [])
 
@@ -76,11 +75,9 @@ export default function DragView() {
 const Columns = memo(({ CategoryInfo }: { CategoryInfo: MediaMap }) => {
     return (<>
         {COMPLETION_LEVELS.map(completionLevel =>
-            <CompletionLevelColumn
+            <CompletionLevelColumn 
                 completionLevel={completionLevel} key={completionLevel} hoverColor={CategoryInfo[completionLevel].hoverColor}
-            >
-
-            </CompletionLevelColumn>
+            />
         )}
     </>)
 })

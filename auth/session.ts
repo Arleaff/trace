@@ -52,7 +52,7 @@ export async function validateSessionToken(token: string): Promise<SessionValida
     }
     if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 15) {
         session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
-        await db`UPDATE user_session SET expires_at = ${session.expiresAt} WHERE id = ${session.id}`;
+        await db`UPDATE "MediaTracker".user_session SET expires_at = ${session.expiresAt} WHERE id = ${session.id}`;
     }
     return { session, user };
 }
