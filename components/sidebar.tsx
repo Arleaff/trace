@@ -1,11 +1,11 @@
-import { Media } from "@/app/home";
 import { AppDispatch, RootState } from "@/app/store";
 import { setMedia, setCurrentList } from "@/mediaSlice";
-import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
+import { InputIcon, TrashIcon } from "@radix-ui/react-icons";
+import { Label } from "@radix-ui/react-label";
 import { AlertDialog, Button, Dialog, Flex, TextField } from "@radix-ui/themes";
 import Image from "next/image"
 import { useSearchParams } from "next/navigation";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function SideBar() {
@@ -41,12 +41,16 @@ export default function SideBar() {
 
         const params = new URLSearchParams(searchParams.toString())
 
-        let list = params.get('list')
+        const allLists = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
+        const list = params.get('list')
         
 
         if (list == null) {
             dispatch(setCurrentList(""))
             dispatch(setMedia([]))
+        }
+        else if (!allLists.includes(list)) {
+            window.history.replaceState({}, '', "/");
         }
         else {
             dispatch(setCurrentList(list))
@@ -152,7 +156,6 @@ const MediaList = memo(function ({ listName }: { listName: string }) {
 
     const searchParams = useSearchParams()
 
-
     const setList = useCallback(() => {
         dispatch(setCurrentList(listName))
 
@@ -177,37 +180,102 @@ const MediaList = memo(function ({ listName }: { listName: string }) {
 
     }, [])
 
+    const renameList = useCallback((newName: string) => {
+        
+        const mediaList = JSON.parse(localStorage.getItem(listName) ?? "[]")
+        const listNames = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
+
+        if (!listNames.includes(newName) && newName.length != 0) {
+            localStorage.removeItem(currentList)
+            localStorage.setItem("lists", JSON.stringify([...listNames.filter(list => list != listName), newName]))
+            localStorage.setItem(newName, JSON.stringify(mediaList))
+
+            dispatch(setCurrentList(newName))
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.set('list', newName)
+
+            window.history.pushState({}, '', `?${params.toString()}`);
+        }
+
+        
+
+
+    }, [])
+
     return (
         <>
-            <Flex className="hover:bg-gray-400 hover:bg-opacity-50 flex-1 cursor-pointer rounded-md border px-2" align={"center"}>
+            <Flex gap={"2"} className="hover:bg-gray-400 hover:bg-opacity-50 flex-1 cursor-pointer rounded-md border px-2" align={"center"}>
                 <li onClick={setList} className=" flex-1" >{listName}</li>
                 { currentList == listName && 
                     <>
+
+                    <Dialog.Root>
+                        <Dialog.Trigger>
+                            <InputIcon width={20} height={20} color="gray" />
+                        </Dialog.Trigger>
+
+                        <Dialog.Content maxWidth="450px">
+
+                            <Dialog.Title>Add List</Dialog.Title>
+
+                            <form action={async (formData) => {
+                                const newName = formData.get("name") as string;
+                                renameList(newName);
+                            }}>
+                                <Label>
+                                    New Name
+                                    <TextField.Root id="name" name="name" autoComplete="off" defaultValue={listName} placeholder="Enter list name" />
+                                </Label>
+
+                                <Flex gap="3" mt="4" justify="between">
+                                    <Dialog.Close>
+                                        <Button variant="soft" color="gray">
+                                            Cancel
+                                        </Button>
+                                    </Dialog.Close>
+
+                                    <Button>Save</Button>
+
+                                </Flex>
+                            </form>
+
+                        </Dialog.Content>
+                    </Dialog.Root>
+
                     <AlertDialog.Root>
                         <AlertDialog.Trigger >
                             <TrashIcon width={20} height={20} color="red" />
                         </AlertDialog.Trigger>
                         <AlertDialog.Content maxWidth="450px">
                             <AlertDialog.Title>Delete list</AlertDialog.Title>
-                            <AlertDialog.Description size="2">
+                            <AlertDialog.Description size="2" mb={"3"} >
                                 Are you sure? <strong>This action cannot be undone.</strong>
                             </AlertDialog.Description>
 
-                            <Flex gap="3" mt="4" justify="between">
-                                <AlertDialog.Cancel>
-                                    <Button variant="soft" color="gray">
-                                        Cancel
-                                    </Button>
-                                </AlertDialog.Cancel>
-                                <AlertDialog.Action>
-                                    <Button variant="solid" color="red" 
-                                    
-                                        // onClick={deleteList}
-                                    >
+                            <form action={async formData => {
+                                const name = formData.get("name");
+                                if (name == listName) {
+                                    deleteList();
+                                }
+                            }}>
+                                <Label>
+                                    Confirm name of list to delete
+                                    <TextField.Root id="name" name="name" autoComplete="off" placeholder="Enter list name" />
+                                </Label>
+
+                                <Flex gap="3" mt="4" justify="between">
+                                    <AlertDialog.Cancel>
+                                        <Button variant="soft" color="gray">
+                                            Cancel
+                                        </Button>
+                                    </AlertDialog.Cancel>
+                                    <Button variant="solid" color="red">
                                         Delete
                                     </Button>
-                                </AlertDialog.Action>
-                            </Flex>
+                                </Flex>
+                            </form>
+
                         </AlertDialog.Content>
                     </AlertDialog.Root>
                         
@@ -218,3 +286,4 @@ const MediaList = memo(function ({ listName }: { listName: string }) {
         </>
     )
 })
+
