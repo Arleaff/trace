@@ -1,4 +1,4 @@
-import { createSlice, current } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 import { CompletionLevel, DialogOptions, Media, MediaSort } from './app/home';
 
 /*
@@ -27,9 +27,9 @@ export const mediaSlice = createSlice({
         },
 
         replaceMedia: (state, action) => {
-            let original = action.payload[0]
-            let edited = action.payload[1]
-            let newList = state.currentMedia.map((media) => media.title == original?.title ? edited : media)
+            const original = action.payload[0]
+            const edited = action.payload[1]
+            const newList = state.currentMedia.map((media) => media.title == original?.title ? edited : media)
 
             localStorage.setItem(state.currentList, JSON.stringify(newList))
             state.currentMedia = newList
@@ -38,13 +38,13 @@ export const mediaSlice = createSlice({
             state.currentMedia = action.payload
         },
         deleteMedia: (state, action) => {
-            let newList = state.currentMedia.filter((media) => media.title != action.payload?.title)
+            const newList = state.currentMedia.filter((media) => media.title != action.payload?.title)
 
             localStorage.setItem(state.currentList, JSON.stringify(newList))
             state.currentMedia = newList
         },
         addMedia: (state, action) => {
-            let newList = [...state.currentMedia, action.payload]
+            const newList = [...state.currentMedia, action.payload]
 
             localStorage.setItem(state.currentList, JSON.stringify(newList))
             state.currentMedia = newList

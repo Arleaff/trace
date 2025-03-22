@@ -49,9 +49,13 @@ export default function MediaDialog() {
                                 const title = formData.get("title");
                                 const rating = formData.get("rating");
 
-                                dialog?.type == "add" ? dispatch(addMedia({ title, rating, completionLevel } as Media)) : dispatch(replaceMedia([dialog?.media, { title, rating, completionLevel } as Media]))
+                                if (dialog?.type == "add") {
+                                    dispatch(addMedia({ title, rating, completionLevel } as Media))
+                                }
+                                else {
+                                    dispatch(replaceMedia([dialog?.media, { title, rating, completionLevel } as Media]))
+                                }
 
-                                dispatch(setDialog(null))
                             }}
                         >
                             <label className="w-[90px] text-right text-[15px]" htmlFor="title">Title</label>
