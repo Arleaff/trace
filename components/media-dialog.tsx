@@ -27,7 +27,7 @@ export default function MediaDialog() {
         if (dialog?.type == "edit") {
             dispatch(deleteMedia(dialog?.media))
         }
-    }, [])
+    }, [dialog?.media, dialog?.type, dispatch])
 
     return (
         <>

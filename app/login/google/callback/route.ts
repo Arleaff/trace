@@ -28,7 +28,7 @@ export async function GET(request: Request): Promise<Response> {
     let tokens: OAuth2Tokens;
     try {
         tokens = await google.validateAuthorizationCode(code, codeVerifier);
-    } catch (e) {
+    } catch {
         // Invalid code or client credentials
         return new Response(null, {
             status: 400
@@ -77,6 +77,6 @@ export async function GET(request: Request): Promise<Response> {
     });
 }
 
-function getUserFromGoogleId(googleUserId: any) {
-    throw new Error("Function not implemented.");
-}
+// function getUserFromGoogleId(googleUserId: any) {
+//     throw new Error("Function not implemented.");
+// }

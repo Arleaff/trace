@@ -57,7 +57,7 @@ export default function SideBar() {
             dispatch(setMedia(JSON.parse(localStorage.getItem(list) ?? "[]")))
         }
         
-    }, [searchParams])
+    }, [dispatch, searchParams])
 
 
 
@@ -165,7 +165,7 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
         params.set('list', listName)
 
         window.history.pushState({}, '', `?${params.toString()}`);
-    }, [])
+    }, [dispatch, listName, searchParams])
 
     const deleteList = useCallback( () =>{
         localStorage.removeItem(currentList)
@@ -178,7 +178,7 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
         window.history.replaceState({}, '', "/");
         
 
-    }, [])
+    }, [currentList, dispatch, listName])
 
     const renameList = useCallback((newName: string) => {
         
@@ -198,10 +198,7 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
             window.history.pushState({}, '', `?${params.toString()}`);
         }
 
-        
-
-
-    }, [])
+    }, [currentList, dispatch, listName, searchParams])
 
     return (
         <>

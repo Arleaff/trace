@@ -1,9 +1,8 @@
 "use client";
 import { useDraggable } from '@dnd-kit/core';
-import MediaDialog from './media-dialog';
 import { DialogOptions, Media } from '@/app/home';
 import { Progress, Theme } from '@radix-ui/themes';
-import { memo, useRef } from 'react';
+import { memo } from 'react';
 import { CSS } from '@dnd-kit/utilities';
 import { Portal, Avatar } from 'radix-ui';
 import { AppDispatch } from '@/app/store';
@@ -16,7 +15,6 @@ import { setDialog } from '@/mediaSlice';
 export const MediaCard = memo(function MediaCard({ media }: 
     { 
         media: Media,
-        onEdit?: (newMedia: Media, originalMedia: Media | undefined) => any, onDelete?: (originalMedia: Media | undefined) => any
     }) {
 
     const { attributes, listeners, setNodeRef, isDragging, transform } = useDraggable({
@@ -87,9 +85,9 @@ export const MediaCard = memo(function MediaCard({ media }:
     )
 })
 
-const CardChildren = memo(({ fallback, media, progressValue, getColor }: {
+const CardChildren = memo(function CardChildren ({ fallback, media, progressValue, getColor }: {
     fallback: string, media: Media, progressValue: number, getColor: "ruby" | "amber" | "iris" | "jade"
-}) => {
+}) {
     return (<> 
             <Avatar.Root className="inline-flex size-[45px] select-none items-center justify-center overflow-hidden rounded-lg  align-middle">
                 <Avatar.Fallback className="leading-1 flex size-full items-center justify-center text-[15px] font-medium bg-[#0058FF20] text-[#002AB3C9]">
@@ -122,7 +120,7 @@ function getProgressColor(rating: number) {
     return 'jade';
 }
 
-export function getTitleLetters(str: String) {
+export function getTitleLetters(str: string) {
     let capitals = "";
     for (let i = 0; i < str.length; i++) {
         if (str[i] === str[i].toUpperCase() && str[i].match(/[A-Z]/)) {
@@ -134,7 +132,7 @@ export function getTitleLetters(str: String) {
     }
 
     if (capitals.length == 0) {
-        let letters = str.match(/(\b[a-zA-Z])/gm);
+        const letters = str.match(/(\b[a-zA-Z])/gm);
         if (letters?.length == 2) return letters[0] + letters[1];
         return letters?.[0] ?? "";
     }

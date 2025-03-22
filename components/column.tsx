@@ -2,21 +2,19 @@
 
 import { CompletionLevel, Media } from '@/app/home';
 import { useDroppable } from '@dnd-kit/core';
-import { memo, RefObject, useState } from 'react';
-import { VList, VListHandle } from 'virtua';
+import { memo } from 'react';
+import { VList } from 'virtua';
 import { MediaCard } from './media-card';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/app/store';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store';
 
 
 
-export const CompletionLevelColumn = memo(function CompletionLevelColumn({ children, completionLevel, hoverColor }: 
+export const CompletionLevelColumn = memo(function CompletionLevelColumn({ completionLevel, hoverColor }: 
     {
-        children?: React.ReactNode, completionLevel: CompletionLevel, hoverColor: string,
+        completionLevel: CompletionLevel, hoverColor: string,
 }) {
 
-
-    const [ gridView, setGridView ] = useState(false)
 
     const { setNodeRef, isOver } = useDroppable({
         id: completionLevel,
@@ -25,14 +23,6 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ child
     const categoryStyle: React.CSSProperties = {
         backgroundColor: isOver ? hoverColor : "white",
         transition: "background-color ease-in-out .5s",
-    };
-
-    const gridStyle: React.CSSProperties = {
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-        justifyItems: "center"
-
-
     };
 
     return (
@@ -47,21 +37,8 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ child
             >{completionLevel}</span>
             
 
-            { 
-                gridView ? 
-                    // consider virtualized grid using the same library
-                    <div
-                        style={gridStyle}
-                        className='gap-3'
-                    >
-                        {children}
-                    </div>
-                :
-                // TODO: see if height changes performance
-                    <VItems completionLevel={completionLevel}></VItems>
-                    
+            <VItems completionLevel={completionLevel}></VItems>
 
-            }
             
             
             

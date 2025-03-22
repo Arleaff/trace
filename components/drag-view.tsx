@@ -1,12 +1,12 @@
-import { COMPLETION_LEVELS, CompletionLevel, Media, MediaSort } from "@/app/home";
-import { AppDispatch, RootState } from "@/app/store";
+import { COMPLETION_LEVELS, CompletionLevel, Media } from "@/app/home";
+import { AppDispatch } from "@/app/store";
 import { CompletionLevelColumn } from "@/components/column";
 import { replaceMedia } from "@/mediaSlice";
 
-import { DndContext, DragEndEvent, DragOverEvent, DragStartEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { memo, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { VList, VListHandle } from "virtua";
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { memo, RefObject, useCallback, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { VListHandle } from "virtua";
 
 
 interface MediaMap {
@@ -37,8 +37,6 @@ export default function DragView() {
         },
     }
     
-    const [filter, setFilter] = useState<CompletionLevel | null>(null)
-
     // const dispatch: AppDispatch = useDispatch()
 
 
@@ -51,12 +49,12 @@ export default function DragView() {
     const dispatch: AppDispatch = useDispatch()
 
     const onDragEnd = useCallback((event: DragEndEvent) => {       
-        let newCompletionLevel = event.over?.id as CompletionLevel
-        let original = event.active.data.current as Media
-        let dragged = { ...event.active.data.current, completionLevel: newCompletionLevel } as Media
+        const newCompletionLevel = event.over?.id as CompletionLevel
+        const original = event.active.data.current as Media
+        const dragged = { ...event.active.data.current, completionLevel: newCompletionLevel } as Media
         dispatch(replaceMedia([original, dragged]))
     }
-    , [])
+    , [dispatch])
 
     return ( <>
 
@@ -72,7 +70,7 @@ export default function DragView() {
     </>)
 }
 
-const Columns = memo(({ CategoryInfo }: { CategoryInfo: MediaMap }) => {
+const Columns = memo(function Columns ({ CategoryInfo }: { CategoryInfo: MediaMap }) {
     return (<>
         {COMPLETION_LEVELS.map(completionLevel =>
             <CompletionLevelColumn 
