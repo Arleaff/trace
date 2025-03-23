@@ -5,7 +5,7 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
-import { addMedia, deleteMedia, replaceMedia, setDialog } from "@/mediaSlice";
+import { addMedia, deleteMedia, setDialog } from "@/mediaSlice";
 import { Box, Button, Dialog, Flex, Select } from "@radix-ui/themes";
 import { useEditMediaMutation } from "@/apiSlice";
 

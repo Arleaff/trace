@@ -1,6 +1,6 @@
 import { useAddListMutation, useGetListsQuery } from "@/apiSlice";
 import { AppDispatch, RootState } from "@/app/store";
-import { setMedia, setCurrentList } from "@/mediaSlice";
+import { setCurrentList } from "@/mediaSlice";
 import { InputIcon, TrashIcon } from "@radix-ui/react-icons";
 import { Label } from "@radix-ui/react-label";
 import { AlertDialog, Button, Dialog, Flex, TextField } from "@radix-ui/themes";
@@ -50,7 +50,6 @@ export default function SideBar() {
         }
         else if (allLists) {
             dispatch(setCurrentList(list))
-            dispatch(setMedia(JSON.parse(localStorage.getItem(list) ?? "[]")))
         }
         
     }, [lists])
@@ -105,21 +104,14 @@ function AddListDialog() {
 
                 <form action={async formData => {
                     const newList = formData.get("name") as string;
-                    const lists = JSON.parse(localStorage.getItem("lists") ?? "[]");
 
-                    if (!lists?.includes(newList)) {
-                        addList(newList)
-                        dispatch(setCurrentList(newList))
-                        setOpen(false)
+                    addList(newList) // TODO: handle error/result
+                    dispatch(setCurrentList(newList))
+                    setOpen(false)
 
-                        const params = new URLSearchParams(searchParams.toString())
-                        params.set('list', newList)
-                        window.history.pushState({}, '', `?${params.toString()}`);
-
-                    }
-                    else {
-                        console.log("error");
-                    }
+                    const params = new URLSearchParams(searchParams.toString())
+                    params.set('list', newList)
+                    window.history.pushState({}, '', `?${params.toString()}`);
 
                 }}>
                     <Flex direction="column" gap="3">
@@ -156,8 +148,6 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
 
     const setList = useCallback(() => {
         dispatch(setCurrentList(listName))
-
-        dispatch(setMedia(JSON.parse(localStorage.getItem(listName) ?? "[]")))
 
         const params = new URLSearchParams(searchParams.toString())
         params.set('list', listName)
