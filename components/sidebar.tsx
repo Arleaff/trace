@@ -1,3 +1,4 @@
+import { useAddListMutation, useGetListsQuery } from "@/apiSlice";
 import { AppDispatch, RootState } from "@/app/store";
 import { setMedia, setCurrentList } from "@/mediaSlice";
 import { InputIcon, TrashIcon } from "@radix-ui/react-icons";
@@ -5,12 +6,12 @@ import { Label } from "@radix-ui/react-label";
 import { AlertDialog, Button, Dialog, Flex, TextField } from "@radix-ui/themes";
 import Image from "next/image"
 import { useSearchParams } from "next/navigation";
+import { list } from "postcss";
 import { memo, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function SideBar() {
 
-    const currentList = useSelector((state: RootState) => state.media.currentList)
     const [open, setOpen] = useState(false);
 
     const sideBarContentStyle: React.CSSProperties = {
@@ -27,21 +28,17 @@ export default function SideBar() {
         transition: "width ease-in-out .5s",
     }
 
-    const [lists, setLists] = useState([]);
-
     const dispatch: AppDispatch = useDispatch()
     const searchParams = useSearchParams()
 
-    useEffect( () => {
-        // get lists from local storage
-        setLists(JSON.parse(localStorage.getItem("lists") ?? "[]")) 
-    }, [currentList])
+    const { data: lists } = useGetListsQuery()    
+
 
     useEffect(() => {
 
         const params = new URLSearchParams(searchParams.toString())
 
-        const allLists = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
+        const allLists = lists
         const list = params.get('list')
         
 
@@ -49,15 +46,15 @@ export default function SideBar() {
             dispatch(setCurrentList(""))
             dispatch(setMedia([]))
         }
-        else if (!allLists.includes(list)) {
+        else if (allLists && !allLists.includes(list)) {         
             window.history.replaceState({}, '', "/");
         }
-        else {
+        else if (allLists) {
             dispatch(setCurrentList(list))
             dispatch(setMedia(JSON.parse(localStorage.getItem(list) ?? "[]")))
         }
         
-    }, [dispatch, searchParams])
+    }, [lists])
 
 
 
@@ -77,7 +74,7 @@ export default function SideBar() {
                 <AddListDialog/>
 
                 {
-                    lists.map((list: string) =>
+                    (lists ?? []).map((list: string) =>
                         <MediaList key={list} listName={list}></MediaList>
                     )
                 }
@@ -93,6 +90,8 @@ function AddListDialog() {
     const dispatch: AppDispatch = useDispatch()
 
     const searchParams = useSearchParams()
+    const [addList, result] = useAddListMutation()
+
 
     return (
 
@@ -110,7 +109,7 @@ function AddListDialog() {
                     const lists = JSON.parse(localStorage.getItem("lists") ?? "[]");
 
                     if (!lists?.includes(newList)) {
-                        localStorage.setItem("lists", JSON.stringify([...lists, newList]))
+                        addList(newList)
                         dispatch(setCurrentList(newList))
                         setOpen(false)
 

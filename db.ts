@@ -40,9 +40,9 @@ export async function getMedia(list: string) {
     const sql = neon(process.env.DATABASE_URL || "");
 
     // get users lists
-    const lists = await sql`SELECT "title", "rating", "category" FROM "MediaTracker"."media" WHERE "list_name" = ${list} AND "user_id" = ${user?.id}`;
+    const media = await sql`SELECT "title", "rating", "category" FROM "MediaTracker"."media" WHERE "list_name" = ${list} AND "user_id" = ${user?.id}`;
 
-    return lists;
+    return media;
 }
 
 // export async function getListMedia(listName: string) {
@@ -57,17 +57,3 @@ export async function getMedia(list: string) {
 
 //     return lists;
 // }
-
-export async function getUserMedia(id: number, listName: string) {
-
-    // get user's Id
-    const sql = neon(process.env.DATABASE_URL || "");
-
-    // get users media
-    const media = await sql(`SELECT "Title", "Extra", "Rating", "Category" FROM "MediaTracker"."media" WHERE "UserId" = '${id}' AND "ListName" = '${listName}'`);
-
-
-
-
-    return media;
-}

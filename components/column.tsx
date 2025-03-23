@@ -7,6 +7,7 @@ import { VList } from 'virtua';
 import { MediaCard } from './media-card';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
+import { useGetMediaQuery } from '@/apiSlice';
 
 
 
@@ -49,12 +50,15 @@ export const CompletionLevelColumn = memo(function CompletionLevelColumn({ compl
 
 const VItems = memo(function VItems({completionLevel}: {completionLevel: CompletionLevel}) {
 
-    const media = useSelector((state: RootState) => state.media.currentMedia)
+    const list = useSelector((state: RootState) => state.media.currentList)
+    const { data: media } = useGetMediaQuery(list)
+
     const sort = useSelector((state: RootState) => state.media.sort)
     const search = useSelector((state: RootState) => state.media.search)
+    
 
     const formatMedia = function formatMedia() {
-        let formattedMedia: Media[] = media.filter(media => media.completionLevel == completionLevel)
+        let formattedMedia: Media[] = (media ?? []).filter(media => media.completionLevel == completionLevel)
 
         if (search.trim().length != 0) {
             formattedMedia = formattedMedia.filter(media => media.title.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
