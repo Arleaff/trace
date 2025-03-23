@@ -7,12 +7,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
 import { addMedia, deleteMedia, replaceMedia, setDialog } from "@/mediaSlice";
 import { Box, Button, Dialog, Flex, Select } from "@radix-ui/themes";
+import { useEditMediaMutation } from "@/apiSlice";
 
 export default function MediaDialog() {
 
     const dialog = useSelector((state: RootState) => state.media.dialog)
     
     const dispatch: AppDispatch = useDispatch()
+    
+    const [editMedia, result] = useEditMediaMutation()
+    const currentList = useSelector((state: RootState) => state.media.currentList)
+
 
 
     const [completionLevel, setCompletionLevel] = useState(dialog?.media?.completionLevel as string ?? "Pending")
@@ -53,7 +58,8 @@ export default function MediaDialog() {
                                     dispatch(addMedia({ title, rating, completionLevel } as Media))
                                 }
                                 else {
-                                    dispatch(replaceMedia([dialog?.media, { title, rating, completionLevel } as Media]))
+                                    editMedia({ old: dialog!.media!, new: { title, rating, completionLevel } as Media, list: currentList })
+                                    dispatch(setDialog(null))
                                 }
 
                             }}

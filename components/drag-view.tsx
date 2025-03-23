@@ -53,7 +53,7 @@ export default function DragView() {
     const currentList = useSelector((state: RootState) => state.media.currentList)
     
 
-    const [editMedia, result] = useEditMediaMutation()
+    const [editMedia] = useEditMediaMutation()
 
 
     const onDragEnd = useCallback((event: DragEndEvent) => {       
