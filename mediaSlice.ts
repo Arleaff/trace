@@ -14,6 +14,7 @@ localStorage.getItem("Games") -> [ {"Minecraft", 10/10, Finished}, etc. ]
 export const mediaSlice = createSlice({
     name: 'media',
     initialState: {
+        allLists: [] as string[],
         currentMedia: [] as Media[],
         currentList: "",
         sort: "highest_rating" as MediaSort,
