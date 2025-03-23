@@ -6,7 +6,6 @@ import { Label } from "@radix-ui/react-label";
 import { AlertDialog, Button, Dialog, Flex, TextField } from "@radix-ui/themes";
 import Image from "next/image"
 import { useSearchParams } from "next/navigation";
-import { list } from "postcss";
 import { memo, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 

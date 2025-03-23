@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery, FetchBaseQueryError, FetchBaseQueryMeta, QueryReturnValue } from '@reduxjs/toolkit/query/react'
-import { addList, getLists, getMedia } from "./db";
+import { addList, editMedia, getLists, getMedia } from "./db";
 import { COMPLETION_LEVELS, Media } from './app/home';
-import { replaceMedia } from './mediaSlice';
 
 
 // async function neonBaseQuery({query:}) {
@@ -65,23 +64,41 @@ export const mediaAPI = createApi({
             providesTags: ["Media"]
         }),
 
-        replaceMedia: build.mutation<Media, { original: Media, new: Media}>({
-            queryFn: async (media: { original: Media, new: Media }): Promise<QueryReturnValue<Media, FetchBaseQueryError, FetchBaseQueryMeta>> => {
+        editMedia: build.mutation<Media, { old: Media, new: Media, list: string }>({
+            queryFn: async (payload: { old: Media, new: Media, list: string }): Promise<QueryReturnValue<Media, FetchBaseQueryError, FetchBaseQueryMeta>> => {
                 try {
-                    
+                    await editMedia(payload.list, payload.old, payload.new)
+
                     // Return the result in an object with a `data` field
-                    return { data: {} as Media }
+                    return { data: payload.new }
                 } catch (error) {
                     // Catch any errors and return them as an object with an `error` field
                     return { error: { status: "CUSTOM_ERROR", data: error, error: error as string ?? "" } };
                 }
-            }, 
-            invalidatesTags: ["Media"]
+            },
+            invalidatesTags: ["Media"],
+            onQueryStarted: async (payload, { dispatch, queryFulfilled }) => {
+                // Optimistic update example
+                const patchResult = dispatch(
+                    mediaAPI.util.updateQueryData('getMedia', payload.list, (draft) => {
+                        const mediaIndex = draft.findIndex(media => media.title === payload.old.title);
+                        if (mediaIndex !== -1) {
+                            draft[mediaIndex] = payload.new;
+                        }
+                    })
+                );
+
+                try {
+                    await queryFulfilled;
+                } catch {
+                    patchResult.undo();
+                }
+            }
         }),
 
 
     }),
 })
 
-export const { useGetListsQuery, useGetMediaQuery, useAddListMutation } = mediaAPI
+export const { useGetListsQuery, useGetMediaQuery, useAddListMutation, useEditMediaMutation } = mediaAPI
 

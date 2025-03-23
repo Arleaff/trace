@@ -1,6 +1,9 @@
 'use server'
 import { neon } from "@neondatabase/serverless";
 import { getCurrentSession } from "./auth/session";
+import { Media } from "./app/home";
+
+const COMPLETION_LEVELS = ['Pending', 'Ongoing', 'Finished', 'Dropped']
 
 export const db = neon(process.env.DATABASE_URL || "");
 
@@ -41,6 +44,32 @@ export async function getMedia(list: string) {
 
     // get users lists
     const media = await sql`SELECT "title", "rating", "category" FROM "MediaTracker"."media" WHERE "list_name" = ${list} AND "user_id" = ${user?.id}`;
+
+    return media;
+}
+
+export async function editMedia(list: string, oldMedia: Media, newMedia: Media) {
+
+    const { user } = await getCurrentSession();
+
+
+    const sql = neon(process.env.DATABASE_URL || "");
+    const completionLevelIndex = COMPLETION_LEVELS.indexOf(newMedia.completionLevel);
+
+    console.log(oldMedia);
+    console.log(newMedia);
+    
+    
+    console.log(completionLevelIndex);
+    
+    
+    // get users lists
+    const media = await sql`UPDATE "MediaTracker".media 
+    SET rating = ${newMedia.rating ?? 0}, category = ${completionLevelIndex}, title = ${newMedia.title}
+    WHERE list_name = ${list} AND user_id = ${user?.id} AND title = ${oldMedia.title} RETURNING *`;
+
+    console.log(media);
+    
 
     return media;
 }
