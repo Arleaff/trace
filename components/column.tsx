@@ -2,7 +2,7 @@
 
 import { CompletionLevel, Media } from '@/app/home';
 import { useDroppable } from '@dnd-kit/core';
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { VList } from 'virtua';
 import { MediaCard } from './media-card';
 import { useSelector } from 'react-redux';
@@ -55,9 +55,9 @@ const VItems = memo(function VItems({completionLevel}: {completionLevel: Complet
 
     const sort = useSelector((state: RootState) => state.media.sort)
     const search = useSelector((state: RootState) => state.media.search)
-    
 
-    const formatMedia = function formatMedia() {
+    // TOOD: order changes on optimistic update?
+    const formatMedia = useCallback(function formatMedia() {
         let formattedMedia: Media[] = (media ?? []).filter(media => media.completionLevel == completionLevel)
 
         if (search.trim().length != 0) {
@@ -83,7 +83,7 @@ const VItems = memo(function VItems({completionLevel}: {completionLevel: Complet
                 })
         }
         // return formattedMedia
-    }
+    }, [media])
 
 
     return (

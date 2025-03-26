@@ -1,4 +1,4 @@
-import { useAddListMutation, useGetListsQuery } from "@/apiSlice";
+import { useAddListMutation, useDeleteListMutation, useEditListMutation, useGetListsQuery } from "@/apiSlice";
 import { AppDispatch, RootState } from "@/app/store";
 import { setCurrentList } from "@/mediaSlice";
 import { InputIcon, TrashIcon } from "@radix-ui/react-icons";
@@ -43,7 +43,6 @@ export default function SideBar() {
 
         if (list == null) {
             dispatch(setCurrentList(""))
-            dispatch(setMedia([]))
         }
         else if (allLists && !allLists.includes(list)) {         
             window.history.replaceState({}, '', "/");
@@ -144,6 +143,10 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
     const currentList = useSelector((state: RootState) => state.media.currentList)
     const dispatch: AppDispatch = useDispatch()
 
+    const [deleteList, deleteResult] = useDeleteListMutation()
+
+    const [editList, editResult] = useEditListMutation()
+
     const searchParams = useSearchParams()
 
     const setList = useCallback(() => {
@@ -155,38 +158,26 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
         window.history.pushState({}, '', `?${params.toString()}`);
     }, [dispatch, listName, searchParams])
 
-    const deleteList = useCallback( () =>{
-        localStorage.removeItem(currentList)
+    const deleteThisList = useCallback( () =>{
 
-        const oldLists = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
-        localStorage.setItem("lists", JSON.stringify(oldLists.filter( list => list != listName)) )
+        deleteList(listName) // TODO: handle error/result
+
         dispatch(setCurrentList(""))
-        dispatch(setMedia([]))
-
         window.history.replaceState({}, '', "/");
         
 
-    }, [currentList, dispatch, listName])
+    }, [])
 
     const renameList = useCallback((newName: string) => {
-        
-        const mediaList = JSON.parse(localStorage.getItem(listName) ?? "[]")
-        const listNames = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
 
-        if (!listNames.includes(newName) && newName.length != 0) {
-            localStorage.removeItem(currentList)
-            localStorage.setItem("lists", JSON.stringify([...listNames.filter(list => list != listName), newName]))
-            localStorage.setItem(newName, JSON.stringify(mediaList))
+        editList({ old: listName, new: newName }) // TODO: handle error/result
 
-            dispatch(setCurrentList(newName))
 
-            const params = new URLSearchParams(searchParams.toString())
-            params.set('list', newName)
-
-            window.history.pushState({}, '', `?${params.toString()}`);
-        }
-
-    }, [currentList, dispatch, listName, searchParams])
+        dispatch(setCurrentList(newName))
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('list', newName)
+        window.history.pushState({}, '', `?${params.toString()}`);
+    }, [searchParams])
 
     return (
         <>
@@ -241,12 +232,12 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
                             <form action={async formData => {
                                 const name = formData.get("name");
                                 if (name == listName) {
-                                    deleteList();
+                                    deleteThisList();
                                 }
                             }}>
                                 <Label>
                                     Confirm name of list to delete
-                                    <TextField.Root id="name" name="name" autoComplete="off" placeholder="Enter list name" />
+                                    <TextField.Root id="name" name="name" autoComplete="off" placeholder={`"${listName}"`} />
                                 </Label>
 
                                 <Flex gap="3" mt="4" justify="between">
