@@ -6,7 +6,7 @@ import { Label } from "@radix-ui/react-label";
 import { AlertDialog, Button, Dialog, Flex, TextField } from "@radix-ui/themes";
 import Image from "next/image"
 import { useSearchParams } from "next/navigation";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function SideBar() {
@@ -30,11 +30,31 @@ export default function SideBar() {
     const dispatch: AppDispatch = useDispatch()
     const searchParams = useSearchParams()
 
-    const { data: lists } = useGetListsQuery()    
+    const { data: lists } = useGetListsQuery()
 
-
+    const prevLists = useRef(lists);
+    
     useEffect(() => {
 
+        const arraysEqual = (a: string[], b: string[]) => {
+            if (a === b) return true;
+            if (a == null || b == null) return false;
+            if (a.length !== b.length) return false;
+
+            for (let i = 0; i < a.length; ++i) {
+                if (a[i] !== b[i]) return false;
+            }
+            return true;
+        };
+
+        if (!arraysEqual(prevLists.current ?? [], lists ?? []) && prevLists.current != undefined) {
+            prevLists.current = lists; 
+            return;
+        }
+
+        prevLists.current = lists; 
+
+        
         const params = new URLSearchParams(searchParams.toString())
 
         const allLists = lists
@@ -51,7 +71,7 @@ export default function SideBar() {
             dispatch(setCurrentList(list))
         }
         
-    }, [lists])
+    }, [searchParams, lists])
 
 
 
@@ -176,7 +196,7 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
         dispatch(setCurrentList(newName))
         const params = new URLSearchParams(searchParams.toString())
         params.set('list', newName)
-        window.history.pushState({}, '', `?${params.toString()}`);
+        window.history.replaceState({}, '', `?${params.toString()}`);
     }, [searchParams])
 
     return (
