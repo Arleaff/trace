@@ -1,5 +1,6 @@
+import { useAddListMutation, useDeleteListMutation, useEditListMutation, useGetListsQuery } from "@/apiSlice";
 import { AppDispatch, RootState } from "@/app/store";
-import { setMedia, setCurrentList } from "@/mediaSlice";
+import { setCurrentList } from "@/mediaSlice";
 import { InputIcon, TrashIcon } from "@radix-ui/react-icons";
 import { Label } from "@radix-ui/react-label";
 import { AlertDialog, Button, Dialog, Flex, TextField } from "@radix-ui/themes";
@@ -10,7 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 export default function SideBar() {
 
-    const currentList = useSelector((state: RootState) => state.media.currentList)
     const [open, setOpen] = useState(false);
 
     const sideBarContentStyle: React.CSSProperties = {
@@ -27,37 +27,31 @@ export default function SideBar() {
         transition: "width ease-in-out .5s",
     }
 
-    const [lists, setLists] = useState([]);
-
     const dispatch: AppDispatch = useDispatch()
     const searchParams = useSearchParams()
 
-    useEffect( () => {
-        // get lists from local storage
-        setLists(JSON.parse(localStorage.getItem("lists") ?? "[]")) 
-    }, [currentList])
+    const { data: lists } = useGetListsQuery()    
+
 
     useEffect(() => {
 
         const params = new URLSearchParams(searchParams.toString())
 
-        const allLists = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
+        const allLists = lists
         const list = params.get('list')
         
 
         if (list == null) {
             dispatch(setCurrentList(""))
-            dispatch(setMedia([]))
         }
-        else if (!allLists.includes(list)) {
+        else if (allLists && !allLists.includes(list)) {         
             window.history.replaceState({}, '', "/");
         }
-        else {
+        else if (allLists) {
             dispatch(setCurrentList(list))
-            dispatch(setMedia(JSON.parse(localStorage.getItem(list) ?? "[]")))
         }
         
-    }, [dispatch, searchParams])
+    }, [lists])
 
 
 
@@ -77,7 +71,7 @@ export default function SideBar() {
                 <AddListDialog/>
 
                 {
-                    lists.map((list: string) =>
+                    (lists ?? []).map((list: string) =>
                         <MediaList key={list} listName={list}></MediaList>
                     )
                 }
@@ -93,6 +87,8 @@ function AddListDialog() {
     const dispatch: AppDispatch = useDispatch()
 
     const searchParams = useSearchParams()
+    const [addList, result] = useAddListMutation()
+
 
     return (
 
@@ -107,21 +103,14 @@ function AddListDialog() {
 
                 <form action={async formData => {
                     const newList = formData.get("name") as string;
-                    const lists = JSON.parse(localStorage.getItem("lists") ?? "[]");
 
-                    if (!lists?.includes(newList)) {
-                        localStorage.setItem("lists", JSON.stringify([...lists, newList]))
-                        dispatch(setCurrentList(newList))
-                        setOpen(false)
+                    addList(newList) // TODO: handle error/result
+                    dispatch(setCurrentList(newList))
+                    setOpen(false)
 
-                        const params = new URLSearchParams(searchParams.toString())
-                        params.set('list', newList)
-                        window.history.pushState({}, '', `?${params.toString()}`);
-
-                    }
-                    else {
-                        console.log("error");
-                    }
+                    const params = new URLSearchParams(searchParams.toString())
+                    params.set('list', newList)
+                    window.history.pushState({}, '', `?${params.toString()}`);
 
                 }}>
                     <Flex direction="column" gap="3">
@@ -154,12 +143,14 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
     const currentList = useSelector((state: RootState) => state.media.currentList)
     const dispatch: AppDispatch = useDispatch()
 
+    const [deleteList, deleteResult] = useDeleteListMutation()
+
+    const [editList, editResult] = useEditListMutation()
+
     const searchParams = useSearchParams()
 
     const setList = useCallback(() => {
         dispatch(setCurrentList(listName))
-
-        dispatch(setMedia(JSON.parse(localStorage.getItem(listName) ?? "[]")))
 
         const params = new URLSearchParams(searchParams.toString())
         params.set('list', listName)
@@ -167,38 +158,26 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
         window.history.pushState({}, '', `?${params.toString()}`);
     }, [dispatch, listName, searchParams])
 
-    const deleteList = useCallback( () =>{
-        localStorage.removeItem(currentList)
+    const deleteThisList = useCallback( () =>{
 
-        const oldLists = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
-        localStorage.setItem("lists", JSON.stringify(oldLists.filter( list => list != listName)) )
+        deleteList(listName) // TODO: handle error/result
+
         dispatch(setCurrentList(""))
-        dispatch(setMedia([]))
-
         window.history.replaceState({}, '', "/");
         
 
-    }, [currentList, dispatch, listName])
+    }, [])
 
     const renameList = useCallback((newName: string) => {
-        
-        const mediaList = JSON.parse(localStorage.getItem(listName) ?? "[]")
-        const listNames = JSON.parse(localStorage.getItem("lists") ?? "[]") as string[]
 
-        if (!listNames.includes(newName) && newName.length != 0) {
-            localStorage.removeItem(currentList)
-            localStorage.setItem("lists", JSON.stringify([...listNames.filter(list => list != listName), newName]))
-            localStorage.setItem(newName, JSON.stringify(mediaList))
+        editList({ old: listName, new: newName }) // TODO: handle error/result
 
-            dispatch(setCurrentList(newName))
 
-            const params = new URLSearchParams(searchParams.toString())
-            params.set('list', newName)
-
-            window.history.pushState({}, '', `?${params.toString()}`);
-        }
-
-    }, [currentList, dispatch, listName, searchParams])
+        dispatch(setCurrentList(newName))
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('list', newName)
+        window.history.pushState({}, '', `?${params.toString()}`);
+    }, [searchParams])
 
     return (
         <>
@@ -253,12 +232,12 @@ const MediaList = memo(function MediaList ({ listName }: { listName: string }) {
                             <form action={async formData => {
                                 const name = formData.get("name");
                                 if (name == listName) {
-                                    deleteList();
+                                    deleteThisList();
                                 }
                             }}>
                                 <Label>
                                     Confirm name of list to delete
-                                    <TextField.Root id="name" name="name" autoComplete="off" placeholder="Enter list name" />
+                                    <TextField.Root id="name" name="name" autoComplete="off" placeholder={`"${listName}"`} />
                                 </Label>
 
                                 <Flex gap="3" mt="4" justify="between">

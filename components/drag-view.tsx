@@ -1,12 +1,15 @@
+import { useEditMediaMutation } from "@/apiSlice";
 import { COMPLETION_LEVELS, CompletionLevel, Media } from "@/app/home";
-import { AppDispatch } from "@/app/store";
+import { AppDispatch, RootState } from "@/app/store";
 import { CompletionLevelColumn } from "@/components/column";
 import { replaceMedia } from "@/mediaSlice";
 
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { memo, RefObject, useCallback, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { VListHandle } from "virtua";
+
+
 
 
 interface MediaMap {
@@ -47,14 +50,23 @@ export default function DragView() {
     );
 
     const dispatch: AppDispatch = useDispatch()
+    const currentList = useSelector((state: RootState) => state.media.currentList)
+    
+
+    const [editMedia] = useEditMediaMutation()
+
 
     const onDragEnd = useCallback((event: DragEndEvent) => {       
         const newCompletionLevel = event.over?.id as CompletionLevel
         const original = event.active.data.current as Media
         const dragged = { ...event.active.data.current, completionLevel: newCompletionLevel } as Media
+
+        editMedia({ old: original, new: dragged, list: currentList})
+        
+
         dispatch(replaceMedia([original, dragged]))
     }
-    , [dispatch])
+    , [currentList])
 
     return ( <>
 
