@@ -5,9 +5,9 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { useCallback, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
-import { addMedia, deleteMedia, setDialog } from "@/mediaSlice";
+import { setDialog } from "@/mediaSlice";
 import { Box, Button, Dialog, Flex, Select } from "@radix-ui/themes";
-import { useEditMediaMutation } from "@/apiSlice";
+import { useAddMediaMutation, useDeleteMediaMutation, useEditMediaMutation } from "@/apiSlice";
 
 export default function MediaDialog() {
 
@@ -15,7 +15,12 @@ export default function MediaDialog() {
     
     const dispatch: AppDispatch = useDispatch()
     
-    const [editMedia, result] = useEditMediaMutation()
+    const [addMedia, addResult] = useAddMediaMutation()
+
+    const [editMedia, editResult] = useEditMediaMutation()
+
+    const [deleteMedia, deleteResult] = useDeleteMediaMutation()
+
     const currentList = useSelector((state: RootState) => state.media.currentList)
 
 
@@ -30,7 +35,9 @@ export default function MediaDialog() {
 
     const onClickAlt = useCallback(() => {
         if (dialog?.type == "edit") {
-            dispatch(deleteMedia(dialog?.media))
+            deleteMedia({ list: currentList, media: dialog.media! })
+            dispatch(setDialog(null))
+            
         }
     }, [dialog?.media, dialog?.type, dispatch])
 
@@ -52,10 +59,20 @@ export default function MediaDialog() {
                             }
                             action={async formData => {                                
                                 const title = formData.get("title");
-                                const rating = formData.get("rating");
+                                if (!title) {
+                                    alert("Title is required")
+                                    return
+                                }
+                                const rating = Number(formData.get("rating"));
+
+                                if (isNaN(rating) || rating < 0 || rating > 10) {
+                                    alert("Rating must be a number between 0 and 10")
+                                    return
+                                }
 
                                 if (dialog?.type == "add") {
-                                    dispatch(addMedia({ title, rating, completionLevel } as Media))
+                                    addMedia({ list: currentList, media: { title, rating, completionLevel } as Media})
+                                    dispatch(setDialog(null))
                                 }
                                 else {
                                     editMedia({ old: dialog!.media!, new: { title, rating, completionLevel } as Media, list: currentList })
