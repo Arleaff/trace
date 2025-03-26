@@ -6,7 +6,6 @@ export const mediaSlice = createSlice({
     name: 'media',
     initialState: {
         allLists: [] as string[],
-        currentMedia: [] as Media[],
         currentList: "",
         sort: "highest_rating" as MediaSort,
         search: "",
@@ -17,22 +16,6 @@ export const mediaSlice = createSlice({
         setCurrentList: (state, action) => {
             state.currentList = action.payload
         },
-
-        replaceMedia: (state, action) => {
-            const original = action.payload[0]
-            const edited = action.payload[1]
-            const newList = state.currentMedia.map((media) => media.title == original?.title ? edited : media)
-            state.currentMedia = newList
-        },
-        deleteMedia: (state, action) => {
-            const newList = state.currentMedia.filter((media) => media.title != action.payload?.title)
-            state.currentMedia = newList
-        },
-        addMedia: (state, action) => {
-            const newList = [...state.currentMedia, action.payload]
-            state.currentMedia = newList
-        },
-
 
         setDialog: (state, action) => {
             state.dialog = action.payload
@@ -51,7 +34,7 @@ export const mediaSlice = createSlice({
 
 
 // Action creators are generated for each case reducer function
-export const { replaceMedia, setCurrentList, setSort, setSearch, deleteMedia, addMedia, setDialog } = mediaSlice.actions
+export const { setCurrentList, setSort, setSearch,  setDialog } = mediaSlice.actions
 
 
 export const mediaReducer = mediaSlice.reducer
