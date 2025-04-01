@@ -83,7 +83,7 @@ const VItems = memo(function VItems({completionLevel}: {completionLevel: Complet
                 })
         }
         // return formattedMedia
-    }, [media])
+    }, [media, search, sort])
 
 
     return (
